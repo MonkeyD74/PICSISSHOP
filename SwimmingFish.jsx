@@ -437,7 +437,7 @@ class FishState {
     const displayAngle = facingLeft ? Math.PI - this.angle : this.angle;
 
     ctx.save();
-    ctx.globalAlpha = this.opacity;
+    ctx.globalAlpha = this.opacity * 0.6;
     ctx.translate(this.x, this.y);
     ctx.rotate(displayAngle);
     if (facingLeft) ctx.scale(-1, 1);
