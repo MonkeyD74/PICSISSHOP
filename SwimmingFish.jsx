@@ -416,7 +416,7 @@ class FishState {
         const pt = this.trail[i];
         const r  = t * 14 + 2;                    // radio 2-16px
         ctx.save();
-        ctx.globalAlpha = t * this.opacity * 0.2;
+        ctx.globalAlpha = t * this.opacity * 0.06;
         ctx.shadowColor = this.glowColor;
         ctx.shadowBlur  = 30;
         ctx.beginPath();
@@ -443,7 +443,7 @@ class FishState {
     if (facingLeft) ctx.scale(-1, 1);
     ctx.scale(this.scale, this.scale);
     ctx.shadowColor = this.glowColor;
-    ctx.shadowBlur  = 45;
+    ctx.shadowBlur  = 18;
     ctx.drawImage(frame, -w / 2, -h / 2, w, h);
     ctx.restore();
   }
