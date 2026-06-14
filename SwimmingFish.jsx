@@ -18,41 +18,58 @@ const RIPPLE_CSS = `
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
-// ── Sonido de agua al tocar el pez ─────────────────────────────────
+// ── Sonido de gota cayendo en agua ─────────────────────────────────
 function playWaterSound(isBlue) {
   try {
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const duration = 0.4;
-    const bufSize  = Math.floor(ac.sampleRate * duration);
+    const ac  = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ac.currentTime;
+
+    // Tono principal: sinewave con pitch que cae rápido (característica de gota)
+    const osc1 = ac.createOscillator();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(isBlue ? 680 : 920, now);
+    osc1.frequency.exponentialRampToValueAtTime(isBlue ? 140 : 200, now + 0.18);
+
+    const g1 = ac.createGain();
+    g1.gain.setValueAtTime(0, now);
+    g1.gain.linearRampToValueAtTime(0.09, now + 0.004); // ataque muy rápido
+    g1.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+    // Resonancia secundaria — "pling" de la superficie del agua
+    const osc2 = ac.createOscillator();
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(isBlue ? 320 : 480, now + 0.01);
+    osc2.frequency.exponentialRampToValueAtTime(isBlue ? 70 : 110, now + 0.22);
+
+    const g2 = ac.createGain();
+    g2.gain.setValueAtTime(0, now + 0.01);
+    g2.gain.linearRampToValueAtTime(0.05, now + 0.015);
+    g2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    // Pequeño ruido suave para el "splash" — muy atenuado
+    const bufSize = Math.floor(ac.sampleRate * 0.06);
     const buf = ac.createBuffer(1, bufSize, ac.sampleRate);
     const d   = buf.getChannelData(0);
-
-    // Ruido blanco con envolvente decayente — sonido de chasquido de agua
     for (let i = 0; i < bufSize; i++) {
-      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 1.8);
+      d[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
     }
-
-    const src = ac.createBufferSource();
-    src.buffer = buf;
-
-    // Filtro bandpass — azul más grave, rosa más agudo
+    const noise = ac.createBufferSource();
+    noise.buffer = buf;
     const bp = ac.createBiquadFilter();
-    bp.type            = "bandpass";
-    bp.frequency.value = isBlue ? 500 : 850;
-    bp.Q.value         = 1.8;
+    bp.type = "bandpass"; bp.frequency.value = 2000; bp.Q.value = 2;
+    const gn = ac.createGain();
+    gn.gain.setValueAtTime(0.018, now);
+    gn.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
-    // Suavizado lowpass
-    const lp = ac.createBiquadFilter();
-    lp.type            = "lowpass";
-    lp.frequency.value = 1400;
+    osc1.connect(g1); g1.connect(ac.destination);
+    osc2.connect(g2); g2.connect(ac.destination);
+    noise.connect(bp); bp.connect(gn); gn.connect(ac.destination);
 
-    const gain = ac.createGain();
-    gain.gain.setValueAtTime(1.4, ac.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
+    osc1.start(now);   osc1.stop(now + 0.35);
+    osc2.start(now + 0.01); osc2.stop(now + 0.4);
+    noise.start(now);
 
-    src.connect(bp); bp.connect(lp); lp.connect(gain); gain.connect(ac.destination);
-    src.start();
-    setTimeout(() => ac.close(), 1500);
+    setTimeout(() => ac.close(), 1200);
   } catch (_) {}
 }
 
