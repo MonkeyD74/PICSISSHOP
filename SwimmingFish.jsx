@@ -128,66 +128,44 @@ class Particle {
     ctx.shadowBlur  = 25;                            // glow fuerte
 
     if (this.type === "bubble") {
-      ctx.globalAlpha = a * 0.08;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
-      ctx.fill();
-      ctx.globalAlpha = a * 0.35;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 1.5;
-      ctx.stroke();
-      ctx.globalAlpha = a * 0.2;
-      ctx.shadowBlur  = 0;
-      ctx.fillStyle   = "#fff";
-      ctx.beginPath();
-      ctx.arc(this.x - this.r * 0.3, this.y - this.r * 0.35, this.r * 0.32, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (this.type === "ripple") {
-      ctx.globalAlpha = a * 0.05;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
-      ctx.fill();
-      ctx.globalAlpha = a * 0.3;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 2;
-      ctx.stroke();
-    } else if (this.type === "splash") {
       ctx.globalAlpha = a * 0.04;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
-      ctx.globalAlpha = a * 0.35;
-      ctx.shadowBlur  = 20;
+      ctx.globalAlpha = a * 0.15;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 2.5;
+      ctx.lineWidth   = 1;
+      ctx.stroke();
+    } else if (this.type === "ripple") {
+      ctx.globalAlpha = a * 0.12;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth   = 1;
+      ctx.stroke();
+    } else if (this.type === "splash") {
+      ctx.globalAlpha = a * 0.14;
+      ctx.shadowBlur  = 8;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth   = 1.5;
       ctx.stroke();
     } else if (this.type === "drop") {
-      ctx.globalAlpha = a * 0.4;
-      ctx.shadowBlur  = 10;
+      ctx.globalAlpha = a * 0.18;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
     } else if (this.type === "wave") {
-      ctx.globalAlpha = a * 0.05;
-      ctx.beginPath();
-      ctx.ellipse(this.x, this.y, this.r, this.r * this.skew, 0, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
-      ctx.fill();
-      ctx.globalAlpha = a * 0.28;
+      ctx.globalAlpha = a * 0.1;
       ctx.beginPath();
       ctx.ellipse(this.x, this.y, this.r, this.r * this.skew, 0, 0, Math.PI * 2);
       ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 1.5;
+      ctx.lineWidth   = 1;
       ctx.stroke();
     }
     ctx.restore();
@@ -483,14 +461,14 @@ export default function SwimmingFish() {
 
     const particles = [];
 
-    // ── Glow suave que sigue el dedo/cursor ────────────────────────
+    // ── Glow suave del dedo/cursor ────────────────────────────────
     let ptrX = -999, ptrY = -999;
     function onMove(e) {
       const pt = e.touches ? e.touches[0] : e;
       ptrX = pt.clientX; ptrY = pt.clientY;
     }
-    window.addEventListener("mousemove",  onMove);
-    window.addEventListener("touchmove",  onMove, { passive: true });
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("touchmove", onMove, { passive: true });
 
     // ── Toque / click sobre un pez ──────────────────────────────────
     function handleTap(e) {
@@ -525,13 +503,14 @@ export default function SwimmingFish() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const cards = Array.from(document.querySelectorAll("[data-product-card]"));
 
-      // ── Glow suave del dedo/cursor ────────────────────────────────
+      // ── Glow del dedo — muy sutil ─────────────────────────────────
       if (ptrX > 0) {
-        const dBlue = Math.hypot(fish[0].x - ptrX, fish[0].y - ptrY);
-        const color  = dBlue < Math.hypot(fish[1].x - ptrX, fish[1].y - ptrY)
+        const color = Math.hypot(fish[0].x - ptrX, fish[0].y - ptrY) <
+                      Math.hypot(fish[1].x - ptrX, fish[1].y - ptrY)
           ? "0,212,255" : "255,68,238";
-        const grad = ctx.createRadialGradient(ptrX, ptrY, 0, ptrX, ptrY, 100);
-        grad.addColorStop(0, `rgba(${color},0.08)`);
+        const grad = ctx.createRadialGradient(ptrX, ptrY, 0, ptrX, ptrY, 130);
+        grad.addColorStop(0, `rgba(${color},0.18)`);
+        grad.addColorStop(0.5, `rgba(${color},0.06)`);
         grad.addColorStop(1, `rgba(${color},0)`);
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -555,11 +534,11 @@ export default function SwimmingFish() {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize",     setSize);
-      window.removeEventListener("click",      handleTap);
-      window.removeEventListener("touchstart", handleTap);
       window.removeEventListener("mousemove",  onMove);
       window.removeEventListener("touchmove",  onMove);
-      document.head.removeChild(style);
+      window.removeEventListener("click",      handleTap);
+      window.removeEventListener("touchstart", handleTap);
+document.head.removeChild(style);
     };
   }, []);
 
