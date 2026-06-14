@@ -18,6 +18,44 @@ const RIPPLE_CSS = `
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
+// ── Sonido de agua al tocar el pez ─────────────────────────────────
+function playWaterSound(isBlue) {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const duration = 0.4;
+    const bufSize  = Math.floor(ac.sampleRate * duration);
+    const buf = ac.createBuffer(1, bufSize, ac.sampleRate);
+    const d   = buf.getChannelData(0);
+
+    // Ruido blanco con envolvente decayente — sonido de chasquido de agua
+    for (let i = 0; i < bufSize; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 1.8);
+    }
+
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+
+    // Filtro bandpass — azul más grave, rosa más agudo
+    const bp = ac.createBiquadFilter();
+    bp.type            = "bandpass";
+    bp.frequency.value = isBlue ? 500 : 850;
+    bp.Q.value         = 1.8;
+
+    // Suavizado lowpass
+    const lp = ac.createBiquadFilter();
+    lp.type            = "lowpass";
+    lp.frequency.value = 1400;
+
+    const gain = ac.createGain();
+    gain.gain.setValueAtTime(1.4, ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
+
+    src.connect(bp); bp.connect(lp); lp.connect(gain); gain.connect(ac.destination);
+    src.start();
+    setTimeout(() => ac.close(), 1500);
+  } catch (_) {}
+}
+
 // ── Partículas de agua ──────────────────────────────────────────────
 class Particle {
   constructor(x, y, color, type) {
@@ -436,6 +474,32 @@ export default function SwimmingFish() {
     ];
 
     const particles = [];
+
+    // ── Toque / click sobre un pez ──────────────────────────────────
+    function handleTap(e) {
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+
+      fish.forEach((f, i) => {
+        const dx = cx - f.x, dy = cy - f.y;
+        if (Math.sqrt(dx * dx + dy * dy) < f.size * 0.75) {
+          // Sonido de agua
+          playWaterSound(i === 0);
+          // Splash en posición actual
+          f.spawnSplash(particles);
+          // Saltar a posición aleatoria visible
+          f.x = window.innerWidth  * (0.15 + Math.random() * 0.7);
+          f.y = window.innerHeight * (0.2  + Math.random() * 0.55);
+          f.swimT   += Math.PI * (0.5 + Math.random());
+          f.state    = "SWIMMING";
+          f.stateTimer = 0;
+        }
+      });
+    }
+
+    window.addEventListener("click",      handleTap);
+    window.addEventListener("touchstart", handleTap, { passive: true });
+
     let last = performance.now(), animId;
 
     function loop(now) {
@@ -461,7 +525,9 @@ export default function SwimmingFish() {
     animId = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("resize", setSize);
+      window.removeEventListener("resize",     setSize);
+      window.removeEventListener("click",      handleTap);
+      window.removeEventListener("touchstart", handleTap);
       document.head.removeChild(style);
     };
   }, []);
