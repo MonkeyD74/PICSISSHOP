@@ -73,70 +73,66 @@ class Particle {
     ctx.shadowBlur  = 25;                            // glow fuerte
 
     if (this.type === "bubble") {
-      // Relleno semitransparente + contorno brillante
-      ctx.globalAlpha = a * 0.25;
+      ctx.globalAlpha = a * 0.08;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
-      ctx.globalAlpha = a * 0.95;
+      ctx.globalAlpha = a * 0.35;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 2.5;
+      ctx.lineWidth   = 1.5;
       ctx.stroke();
-      // Highlight blanco
-      ctx.globalAlpha = a * 0.6;
+      ctx.globalAlpha = a * 0.2;
       ctx.shadowBlur  = 0;
       ctx.fillStyle   = "#fff";
       ctx.beginPath();
       ctx.arc(this.x - this.r * 0.3, this.y - this.r * 0.35, this.r * 0.32, 0, Math.PI * 2);
       ctx.fill();
     } else if (this.type === "ripple") {
-      // Círculo (no elipse) con relleno tenue
-      ctx.globalAlpha = a * 0.18;
+      ctx.globalAlpha = a * 0.05;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
-      ctx.globalAlpha = a * 0.9;
+      ctx.globalAlpha = a * 0.3;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 3;
+      ctx.lineWidth   = 2;
       ctx.stroke();
     } else if (this.type === "splash") {
-      // Anillo grande con relleno luminoso
-      ctx.globalAlpha = a * 0.12;
+      ctx.globalAlpha = a * 0.04;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
-      ctx.globalAlpha = a;
-      ctx.shadowBlur  = 40;
+      ctx.globalAlpha = a * 0.35;
+      ctx.shadowBlur  = 20;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 4;
+      ctx.lineWidth   = 2.5;
       ctx.stroke();
     } else if (this.type === "drop") {
-      ctx.globalAlpha = a;
-      ctx.shadowBlur  = 20;
+      ctx.globalAlpha = a * 0.4;
+      ctx.shadowBlur  = 10;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
     } else if (this.type === "wave") {
-      ctx.globalAlpha = a * 0.15;
+      ctx.globalAlpha = a * 0.05;
       ctx.beginPath();
       ctx.ellipse(this.x, this.y, this.r, this.r * this.skew, 0, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
-      ctx.globalAlpha = a * 0.85;
+      ctx.globalAlpha = a * 0.28;
       ctx.beginPath();
       ctx.ellipse(this.x, this.y, this.r, this.r * this.skew, 0, 0, Math.PI * 2);
       ctx.strokeStyle = this.color;
-      ctx.lineWidth   = 2.5;
+      ctx.lineWidth   = 1.5;
       ctx.stroke();
     }
     ctx.restore();
@@ -374,7 +370,7 @@ class FishState {
         const pt = this.trail[i];
         const r  = t * 14 + 2;                    // radio 2-16px
         ctx.save();
-        ctx.globalAlpha = t * this.opacity * 0.55;
+        ctx.globalAlpha = t * this.opacity * 0.2;
         ctx.shadowColor = this.glowColor;
         ctx.shadowBlur  = 30;
         ctx.beginPath();
