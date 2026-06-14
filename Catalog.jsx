@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import AnimatedLogo from "./AnimatedLogo";
 import SwimmingFish from "./SwimmingFish";
+import "./Catalog.css";
 
 // Tema visual por categoría
 const CATEGORY_THEMES = {
@@ -285,7 +286,7 @@ export default function Catalog({ products, categories, error }) {
         @keyframes pulse { 0%,100% { box-shadow: 0 4px 18px rgba(255,45,85,0.35) } 50% { box-shadow: 0 4px 28px rgba(255,45,85,0.65) } }
         @keyframes marquee { from { transform: translateX(100%) } to { transform: translateX(-100%) } }
         * { box-sizing: border-box; }
-        input::placeholder { color: ${theme.textDim}; }
+input::placeholder { color: ${theme.textDim}; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: ${theme.bg}; }
         ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 3px; }
@@ -298,7 +299,7 @@ export default function Catalog({ products, categories, error }) {
 
         {/* Banner marquee */}
         <div style={{ background: "linear-gradient(90deg, #ff2d55, #ff6b00, #ff2d55)", padding: "10px 0", overflow: "hidden" }}>
-          <div style={{ whiteSpace: "nowrap", animation: "marquee 18s linear infinite", display: "inline-block" }}>
+          <div style={{ whiteSpace: "nowrap", animation: "marquee 70s linear infinite", display: "inline-block" }}>
             {[...Array(4)].map((_, i) => (
               <span key={i} style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 1, marginRight: 60 }}>
                 🔥 OFERTA ESPECIAL · HASTA 50% DE DESCUENTO · ¡CONSULTA TU PRECIO POR WHATSAPP! 💬 · TIEMPO LIMITADO ⏰
@@ -383,7 +384,7 @@ export default function Catalog({ products, categories, error }) {
         </div>
 
         {/* Grid */}
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "16px 20px 60px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+        <div className="product-grid">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} theme={theme} discount={getDiscount(p.specs)} />
           ))}

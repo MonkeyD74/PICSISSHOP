@@ -18,6 +18,132 @@ const RIPPLE_CSS = `
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
+// ── Partículas de agua ──────────────────────────────────────────────
+class Particle {
+  constructor(x, y, color, type) {
+    this.x     = x;
+    this.y     = y;
+    this.color = color;
+    this.type  = type; // 'bubble' | 'ripple' | 'splash' | 'drop' | 'wave'
+    this.life  = 1;
+
+    if (type === "bubble") {
+      this.r     = Math.random() * 10 + 5;          // 5-15px (antes 1.5-5)
+      this.vx    = (Math.random() - 0.5) * 2.5;
+      this.vy    = -(Math.random() * 2.5 + 1);
+      this.decay = 0.4 + Math.random() * 0.25;
+    } else if (type === "ripple") {
+      this.r     = Math.random() * 10 + 20;         // empieza en 20-30px
+      this.grow  = Math.random() * 60 + 70;         // crece 70-130px/s
+      this.vx = this.vy = 0;
+      this.decay = 0.75;
+    } else if (type === "splash") {
+      this.r     = Math.random() * 20 + 30;         // empieza 30-50px
+      this.grow  = Math.random() * 120 + 130;       // crece 130-250px/s
+      this.vx = this.vy = 0;
+      this.decay = 0.9;
+    } else if (type === "drop") {
+      this.r       = Math.random() * 5 + 3;         // 3-8px
+      this.vx      = (Math.random() - 0.5) * 8;
+      this.vy      = -(Math.random() * 7 + 3);
+      this.gravity = 12;
+      this.decay   = 0.9;
+    } else if (type === "wave") {
+      this.r     = Math.random() * 20 + 30;         // 30-50px
+      this.grow  = Math.random() * 30 + 20;
+      this.skew  = Math.random() * 0.3 + 0.45;      // menos aplastado
+      this.vx = this.vy = 0;
+      this.decay = 0.6;
+    }
+  }
+
+  update(dt) {
+    this.life -= dt * this.decay;
+    this.x += (this.vx || 0) * dt * 60;
+    this.y += (this.vy || 0) * dt * 60;
+    if (this.gravity) this.vy += this.gravity * dt;
+    if (this.grow) this.r += this.grow * dt;
+  }
+
+  draw(ctx) {
+    if (this.life <= 0) return;
+    const a = Math.max(0, this.life);
+    ctx.save();
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur  = 25;                            // glow fuerte
+
+    if (this.type === "bubble") {
+      // Relleno semitransparente + contorno brillante
+      ctx.globalAlpha = a * 0.25;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.globalAlpha = a * 0.95;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth   = 2.5;
+      ctx.stroke();
+      // Highlight blanco
+      ctx.globalAlpha = a * 0.6;
+      ctx.shadowBlur  = 0;
+      ctx.fillStyle   = "#fff";
+      ctx.beginPath();
+      ctx.arc(this.x - this.r * 0.3, this.y - this.r * 0.35, this.r * 0.32, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (this.type === "ripple") {
+      // Círculo (no elipse) con relleno tenue
+      ctx.globalAlpha = a * 0.18;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.globalAlpha = a * 0.9;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth   = 3;
+      ctx.stroke();
+    } else if (this.type === "splash") {
+      // Anillo grande con relleno luminoso
+      ctx.globalAlpha = a * 0.12;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.globalAlpha = a;
+      ctx.shadowBlur  = 40;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth   = 4;
+      ctx.stroke();
+    } else if (this.type === "drop") {
+      ctx.globalAlpha = a;
+      ctx.shadowBlur  = 20;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    } else if (this.type === "wave") {
+      ctx.globalAlpha = a * 0.15;
+      ctx.beginPath();
+      ctx.ellipse(this.x, this.y, this.r, this.r * this.skew, 0, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.globalAlpha = a * 0.85;
+      ctx.beginPath();
+      ctx.ellipse(this.x, this.y, this.r, this.r * this.skew, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth   = 2.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+// ── Estado y lógica del pez ─────────────────────────────────────────
 class FishState {
   constructor({ speed, size, index, splashClass, glowColor, totalFrames }) {
     this.speed       = speed;
@@ -28,6 +154,10 @@ class FishState {
     this.totalFrames = totalFrames;
     this.frameIndex  = 0;
     this.frameTimer  = 0;
+    this.rippleTimer = 0;
+    this.bubbleTimer = 0;
+    this.waveTimer   = 0;
+    this.trail       = [];                       // estela de posiciones
     this.x           = window.innerWidth / 2;
     this.y           = 160;
     this.angle       = 0;
@@ -52,15 +182,49 @@ class FishState {
     };
   }
 
-  update(dt, cards) {
+  spawnSplash(particles) {
+    // 8 anillos concéntricos escalonados — efecto "agua"
+    for (let i = 0; i < 8; i++) {
+      const delay = i * 55;
+      setTimeout(() => {
+        particles.push(new Particle(this.x, this.y, this.glowColor, "splash"));
+      }, delay);
+    }
+    // 22 gotas disparadas en arco
+    for (let i = 0; i < 22; i++) {
+      const p = new Particle(this.x, this.y, this.glowColor, "drop");
+      const ang = (i / 22) * Math.PI * 2;
+      p.vx = Math.cos(ang) * (Math.random() * 5 + 3);
+      p.vy = Math.sin(ang) * (Math.random() * 5 + 3) - 4;
+      particles.push(p);
+    }
+    // 16 burbujas flotando
+    for (let i = 0; i < 16; i++) {
+      const p = new Particle(
+        this.x + (Math.random() - 0.5) * 80,
+        this.y + (Math.random() - 0.5) * 80,
+        this.glowColor, "bubble"
+      );
+      p.vy = -(Math.random() * 4 + 1.5);
+      particles.push(p);
+    }
+    // 4 olas elípticas
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        particles.push(new Particle(this.x, this.y, this.glowColor, "wave"));
+      }, i * 100);
+    }
+  }
+
+  update(dt, cards, particles) {
     this.stateTimer += dt;
     this.swimT      += dt * this.speed;
 
     // Ciclar frames a 8fps
     this.frameTimer += dt;
     if (this.frameTimer > 1 / 8) {
-      this.frameTimer  = 0;
-      this.frameIndex  = (this.frameIndex + 1) % this.totalFrames;
+      this.frameTimer = 0;
+      this.frameIndex = (this.frameIndex + 1) % this.totalFrames;
     }
 
     const px = this.x, py = this.y;
@@ -76,8 +240,14 @@ class FishState {
       }
       case "SWIMMING": {
         const pos = this.swimPos(this.swimT);
-        this.x = lerp(this.x, pos.x, dt * 1.8);
-        this.y = lerp(this.y, pos.y, dt * 1.8);
+        const sdx = pos.x - this.x, sdy = pos.y - this.y;
+        const sd = Math.sqrt(sdx * sdx + sdy * sdy);
+        const MAX_SWIM = 55; // px/s — velocidad máxima nadando
+        if (sd > 1) {
+          const move = Math.min(sd, MAX_SWIM * dt);
+          this.x += (sdx / sd) * move;
+          this.y += (sdy / sd) * move;
+        }
         this.opacity = Math.min(1, this.opacity + dt * 2);
         this.scale   = Math.min(1, this.scale   + dt * 2);
         if (this.stateTimer > 7 + this.index * 3 && cards.length > 0) {
@@ -102,11 +272,12 @@ class FishState {
         const tdy = this.targetY - this.y;
         const td  = Math.sqrt(tdx * tdx + tdy * tdy);
         if (td > 0.5) {
-          const step = Math.min(300 * dt, td);
+          const step = Math.min(50 * dt, td);
           this.x += (tdx / td) * step;
           this.y += (tdy / td) * step;
         }
         if (td < 40) {
+          this.spawnSplash(particles);
           if (this.targetCard) {
             this.targetCard.classList.add(this.splashClass);
             const card = this.targetCard;
@@ -142,6 +313,47 @@ class FishState {
       }
     }
 
+    // Estela (trail) — siempre que el pez sea visible
+    if (this.opacity > 0.2) {
+      this.trail.push({ x: this.x, y: this.y, life: 1 });
+      if (this.trail.length > 22) this.trail.shift();
+    }
+
+    // Efectos de agua mientras nada
+    const spd = Math.sqrt((this.x - px) ** 2 + (this.y - py) ** 2) / dt;
+    if (this.opacity > 0.3 && spd > 8) {
+
+      // Burbujas — más frecuentes y siempre 2+
+      this.bubbleTimer += dt;
+      const bRate = spd > 100 ? 0.05 : 0.09;
+      if (this.bubbleTimer > bRate) {
+        this.bubbleTimer = 0;
+        const n = spd > 150 ? 4 : spd > 80 ? 3 : 2;
+        for (let i = 0; i < n; i++) {
+          particles.push(new Particle(
+            this.x + (Math.random() - 0.5) * 30,
+            this.y + (Math.random() - 0.5) * 30,
+            this.glowColor, "bubble"
+          ));
+        }
+      }
+
+      // Ondas circulares (ripples)
+      this.rippleTimer += dt;
+      if (this.rippleTimer > 0.22) {
+        this.rippleTimer = 0;
+        particles.push(new Particle(this.x, this.y, this.glowColor, "ripple"));
+      }
+
+      // Olas elípticas de superficie
+      this.waveTimer += dt;
+      if (this.waveTimer > 0.45) {
+        this.waveTimer = 0;
+        particles.push(new Particle(this.x, this.y, this.glowColor, "wave"));
+      }
+    }
+
+    // Ángulo suavizado
     const adx = this.x - px, ady = this.y - py;
     if (Math.abs(adx) + Math.abs(ady) > 0.3) {
       let diff = Math.atan2(ady, adx) - this.angle;
@@ -153,12 +365,32 @@ class FishState {
 
   draw(ctx, frames) {
     if (this.opacity <= 0 || this.scale <= 0) return;
+
+    // ── Estela de brillo ───────────────────────────────────────────
+    const tLen = this.trail.length;
+    if (tLen > 1) {
+      for (let i = 1; i < tLen; i++) {
+        const t  = i / tLen;                      // 0→1 (más viejo→reciente)
+        const pt = this.trail[i];
+        const r  = t * 14 + 2;                    // radio 2-16px
+        ctx.save();
+        ctx.globalAlpha = t * this.opacity * 0.55;
+        ctx.shadowColor = this.glowColor;
+        ctx.shadowBlur  = 30;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = this.glowColor;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // ── Dibujo del pez ─────────────────────────────────────────────
     const frame = frames[this.frameIndex];
     if (!frame || !frame.complete || !frame.naturalWidth) return;
 
     const w = this.size;
     const h = (frame.naturalHeight / frame.naturalWidth) * w;
-
     const facingLeft   = Math.cos(this.angle) < 0;
     const displayAngle = facingLeft ? Math.PI - this.angle : this.angle;
 
@@ -169,12 +401,13 @@ class FishState {
     if (facingLeft) ctx.scale(-1, 1);
     ctx.scale(this.scale, this.scale);
     ctx.shadowColor = this.glowColor;
-    ctx.shadowBlur  = 35;
+    ctx.shadowBlur  = 45;
     ctx.drawImage(frame, -w / 2, -h / 2, w, h);
     ctx.restore();
   }
 }
 
+// ── Componente principal ────────────────────────────────────────────
 export default function SwimmingFish() {
   const canvasRef = useRef(null);
 
@@ -189,25 +422,24 @@ export default function SwimmingFish() {
     setSize();
     window.addEventListener("resize", setSize);
 
-    // Pez azul — 16 frames PNG transparentes
-    const azulFrames = Array.from({ length: 16 }, (_, i) => {
+    const azulFrames = Array.from({ length: 10 }, (_, i) => {
       const img = new Image();
       img.src = `/frames-azul/azul_${String(i + 1).padStart(2, "0")}.png`;
       return img;
     });
 
-    // Pez rosa — 9 frames PNG transparentes
-    const rosaFrames = Array.from({ length: 9 }, (_, i) => {
+    const rosaFrames = Array.from({ length: 10 }, (_, i) => {
       const img = new Image();
       img.src = `/frames-rosa/rosa_${String(i + 1).padStart(2, "0")}.png`;
       return img;
     });
 
     const fish = [
-      new FishState({ speed: 0.28, size: 185, index: 0, splashClass: "fish-splash-blue", glowColor: "#00d4ff", totalFrames: 10 }),
-      new FishState({ speed: 0.23, size: 165, index: 1, splashClass: "fish-splash-pink", glowColor: "#ff44ee", totalFrames: 10 }),
+      new FishState({ speed: 0.06, size: 190, index: 0, splashClass: "fish-splash-blue", glowColor: "#00d4ff", totalFrames: 10 }),
+      new FishState({ speed: 0.05, size: 240, index: 1, splashClass: "fish-splash-pink", glowColor: "#ff44ee", totalFrames: 10 }),
     ];
 
+    const particles = [];
     let last = performance.now(), animId;
 
     function loop(now) {
@@ -215,8 +447,18 @@ export default function SwimmingFish() {
       last        = now;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const cards = Array.from(document.querySelectorAll("[data-product-card]"));
-      fish[0].update(dt, cards); fish[0].draw(ctx, azulFrames);
-      fish[1].update(dt, cards); fish[1].draw(ctx, rosaFrames);
+
+      // Partículas primero (detrás de los peces)
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update(dt);
+        if (particles[i].life <= 0) particles.splice(i, 1);
+        else particles[i].draw(ctx);
+      }
+
+      // Peces encima
+      fish[0].update(dt, cards, particles); fish[0].draw(ctx, azulFrames);
+      fish[1].update(dt, cards, particles); fish[1].draw(ctx, rosaFrames);
+
       animId = requestAnimationFrame(loop);
     }
 
