@@ -234,37 +234,32 @@ class FishState {
   }
 
   spawnSplash(particles) {
-    // 8 anillos concéntricos escalonados — efecto "agua"
-    for (let i = 0; i < 8; i++) {
-      const delay = i * 55;
+    // 3 anillos concéntricos
+    for (let i = 0; i < 3; i++) {
       setTimeout(() => {
         particles.push(new Particle(this.x, this.y, this.glowColor, "splash"));
-      }, delay);
+      }, i * 80);
     }
-    // 22 gotas disparadas en arco
-    for (let i = 0; i < 22; i++) {
+    // 8 gotas en arco
+    for (let i = 0; i < 8; i++) {
       const p = new Particle(this.x, this.y, this.glowColor, "drop");
-      const ang = (i / 22) * Math.PI * 2;
-      p.vx = Math.cos(ang) * (Math.random() * 5 + 3);
-      p.vy = Math.sin(ang) * (Math.random() * 5 + 3) - 4;
+      const ang = (i / 8) * Math.PI * 2;
+      p.vx = Math.cos(ang) * (Math.random() * 3 + 2);
+      p.vy = Math.sin(ang) * (Math.random() * 3 + 2) - 3;
       particles.push(p);
     }
-    // 16 burbujas flotando
-    for (let i = 0; i < 16; i++) {
+    // 4 burbujas
+    for (let i = 0; i < 4; i++) {
       const p = new Particle(
-        this.x + (Math.random() - 0.5) * 80,
-        this.y + (Math.random() - 0.5) * 80,
+        this.x + (Math.random() - 0.5) * 40,
+        this.y + (Math.random() - 0.5) * 40,
         this.glowColor, "bubble"
       );
-      p.vy = -(Math.random() * 4 + 1.5);
+      p.vy = -(Math.random() * 2 + 1);
       particles.push(p);
     }
-    // 4 olas elípticas
-    for (let i = 0; i < 4; i++) {
-      setTimeout(() => {
-        particles.push(new Particle(this.x, this.y, this.glowColor, "wave"));
-      }, i * 100);
-    }
+    // 1 ola
+    particles.push(new Particle(this.x, this.y, this.glowColor, "wave"));
   }
 
   update(dt, cards, particles) {
@@ -374,31 +369,27 @@ class FishState {
     const spd = Math.sqrt((this.x - px) ** 2 + (this.y - py) ** 2) / dt;
     if (this.opacity > 0.3 && spd > 8) {
 
-      // Burbujas — más frecuentes y siempre 2+
+      // Burbujas — pocas, sutiles
       this.bubbleTimer += dt;
-      const bRate = spd > 100 ? 0.05 : 0.09;
-      if (this.bubbleTimer > bRate) {
+      if (this.bubbleTimer > 0.28) {
         this.bubbleTimer = 0;
-        const n = spd > 150 ? 4 : spd > 80 ? 3 : 2;
-        for (let i = 0; i < n; i++) {
-          particles.push(new Particle(
-            this.x + (Math.random() - 0.5) * 30,
-            this.y + (Math.random() - 0.5) * 30,
-            this.glowColor, "bubble"
-          ));
-        }
+        particles.push(new Particle(
+          this.x + (Math.random() - 0.5) * 20,
+          this.y + (Math.random() - 0.5) * 20,
+          this.glowColor, "bubble"
+        ));
       }
 
-      // Ondas circulares (ripples)
+      // Ripple suave — poco frecuente
       this.rippleTimer += dt;
-      if (this.rippleTimer > 0.22) {
+      if (this.rippleTimer > 0.7) {
         this.rippleTimer = 0;
         particles.push(new Particle(this.x, this.y, this.glowColor, "ripple"));
       }
 
-      // Olas elípticas de superficie
+      // Olas — mínimas
       this.waveTimer += dt;
-      if (this.waveTimer > 0.45) {
+      if (this.waveTimer > 1.4) {
         this.waveTimer = 0;
         particles.push(new Particle(this.x, this.y, this.glowColor, "wave"));
       }
@@ -492,6 +483,15 @@ export default function SwimmingFish() {
 
     const particles = [];
 
+    // ── Glow suave que sigue el dedo/cursor ────────────────────────
+    let ptrX = -999, ptrY = -999;
+    function onMove(e) {
+      const pt = e.touches ? e.touches[0] : e;
+      ptrX = pt.clientX; ptrY = pt.clientY;
+    }
+    window.addEventListener("mousemove",  onMove);
+    window.addEventListener("touchmove",  onMove, { passive: true });
+
     // ── Toque / click sobre un pez ──────────────────────────────────
     function handleTap(e) {
       const cx = e.touches ? e.touches[0].clientX : e.clientX;
@@ -525,6 +525,18 @@ export default function SwimmingFish() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const cards = Array.from(document.querySelectorAll("[data-product-card]"));
 
+      // ── Glow suave del dedo/cursor ────────────────────────────────
+      if (ptrX > 0) {
+        const dBlue = Math.hypot(fish[0].x - ptrX, fish[0].y - ptrY);
+        const color  = dBlue < Math.hypot(fish[1].x - ptrX, fish[1].y - ptrY)
+          ? "0,212,255" : "255,68,238";
+        const grad = ctx.createRadialGradient(ptrX, ptrY, 0, ptrX, ptrY, 100);
+        grad.addColorStop(0, `rgba(${color},0.08)`);
+        grad.addColorStop(1, `rgba(${color},0)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
       // Partículas primero (detrás de los peces)
       for (let i = particles.length - 1; i >= 0; i--) {
         particles[i].update(dt);
@@ -545,6 +557,8 @@ export default function SwimmingFish() {
       window.removeEventListener("resize",     setSize);
       window.removeEventListener("click",      handleTap);
       window.removeEventListener("touchstart", handleTap);
+      window.removeEventListener("mousemove",  onMove);
+      window.removeEventListener("touchmove",  onMove);
       document.head.removeChild(style);
     };
   }, []);
@@ -553,7 +567,7 @@ export default function SwimmingFish() {
     <canvas ref={canvasRef} style={{
       position: "fixed", top: 0, left: 0,
       width: "100vw", height: "100vh",
-      pointerEvents: "none", zIndex: 50,
+      pointerEvents: "none", zIndex: 1,   // detrás de todo el contenido
     }} />
   );
 }

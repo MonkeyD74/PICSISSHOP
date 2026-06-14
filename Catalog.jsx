@@ -291,7 +291,7 @@ input::placeholder { color: ${theme.textDim}; }
         ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 3px; }
       `}</style>
 
-      <div style={{
+      <div id="page-content" style={{
         minHeight: "100vh", background: theme.bg, color: theme.text,
         fontFamily: "'DM Sans', sans-serif", transition: "background .5s ease, color .5s ease"
       }}>

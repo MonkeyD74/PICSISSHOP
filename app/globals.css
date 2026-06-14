@@ -1,5 +1,11 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Todo el contenido de la página por encima del canvas de peces */
+#page-content {
+  position: relative;
+  z-index: 2;
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
