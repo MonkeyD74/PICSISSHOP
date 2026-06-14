@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import AnimatedLogo from "./AnimatedLogo";
 import SwimmingFish from "./SwimmingFish";
-import "./Catalog.css";
 
 // Tema visual por categoría
 const CATEGORY_THEMES = {
