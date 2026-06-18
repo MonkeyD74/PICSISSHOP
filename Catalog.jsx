@@ -3,6 +3,10 @@
 import { useState, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Pagination, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 import AnimatedLogo from "./AnimatedLogo";
 import SwimmingFish from "./SwimmingFish";
 
