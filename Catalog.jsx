@@ -283,6 +283,12 @@ export default function Catalog({ products, categories, error }) {
     return list;
   }, [category, search, sortBy, products]);
 
+  // Destacados: productos con descuento primero; si no hay suficientes, primeros 8
+  const featured = useMemo(() => {
+    const withDiscount = products.filter((p) => getDiscount(p.specs) > 0);
+    return withDiscount.length >= 3 ? withDiscount.slice(0, 10) : products.slice(0, 8);
+  }, [products]);
+
   return (
     <>
       <style>{`
@@ -327,6 +333,43 @@ input::placeholder { color: ${theme.textDim}; }
             </div>
           </div>
         )}
+
+        {/* ── Carrusel 3D Destacados ─────────────────────── */}
+        {featured.length > 0 && (
+          <div style={{ paddingTop: 36 }}>
+            {/* Título de sección */}
+            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px 14px", display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${theme.accent}50)` }} />
+              <span style={{ color: theme.accent, fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase" }}>
+                🔥 Destacados
+              </span>
+              <div style={{ flex: 1, height: 1, background: `linear-gradient(270deg, transparent, ${theme.accent}50)` }} />
+            </div>
+
+            <Swiper
+              className="catalog-swiper"
+              effect="coverflow"
+              grabCursor={true}
+              centeredSlides={true}
+              slidesPerView="auto"
+              coverflowEffect={{ rotate: 32, stretch: 0, depth: 140, modifier: 1.15, slideShadows: true }}
+              pagination={{ clickable: true }}
+              navigation={true}
+              modules={[EffectCoverflow, Pagination, Navigation]}
+            >
+              {featured.map((p) => (
+                <SwiperSlide key={p.id}>
+                  <ProductCard product={p} theme={theme} discount={getDiscount(p.specs)} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        )}
+
+        {/* Separador */}
+        <div style={{ maxWidth: 1100, margin: "8px auto 0", padding: "0 20px" }}>
+          <div style={{ height: 1, background: `linear-gradient(90deg, transparent, ${theme.border} 20%, ${theme.border} 80%, transparent)` }} />
+        </div>
 
         {/* Tier legend — solo Calzado */}
         {category === "Calzado" && (
@@ -384,42 +427,25 @@ input::placeholder { color: ${theme.textDim}; }
           </select>
         </div>
 
+        {/* ── Catálogo completo — grid normal ───────────── */}
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "16px 20px 0" }}>
-          <p style={{ color: theme.textDim, fontSize: 13, margin: 0 }}>{filtered.length} producto{filtered.length !== 1 ? "s" : ""}</p>
+          <p style={{ color: theme.textDim, fontSize: 13, margin: 0 }}>
+            {filtered.length} producto{filtered.length !== 1 ? "s" : ""}
+          </p>
         </div>
 
-        {/* Catálogo — Swiper 3D Coverflow */}
-        {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <p style={{ color: theme.textDim, fontSize: 16 }}>
-              {products.length === 0 ? "Aún no hay productos cargados en Loyverse" : "No se encontraron productos"}
-            </p>
-          </div>
-        ) : (
-          <Swiper
-            className="catalog-swiper"
-            effect="coverflow"
-            grabCursor={true}
-            centeredSlides={true}
-            slidesPerView="auto"
-            coverflowEffect={{
-              rotate: 32,
-              stretch: 0,
-              depth: 140,
-              modifier: 1.15,
-              slideShadows: true,
-            }}
-            pagination={{ clickable: true }}
-            navigation={true}
-            modules={[EffectCoverflow, Pagination, Navigation]}
-          >
-            {filtered.map((p) => (
-              <SwiperSlide key={p.id}>
-                <ProductCard product={p} theme={theme} discount={getDiscount(p.specs)} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        )}
+        <div className="product-grid">
+          {filtered.map((p) => (
+            <ProductCard key={p.id} product={p} theme={theme} discount={getDiscount(p.specs)} />
+          ))}
+          {filtered.length === 0 && (
+            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 0" }}>
+              <p style={{ color: theme.textDim, fontSize: 16 }}>
+                {products.length === 0 ? "Aún no hay productos cargados en Loyverse" : "No se encontraron productos"}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
