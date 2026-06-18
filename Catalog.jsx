@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCoverflow, Pagination, Navigation } from "swiper/modules";
 import AnimatedLogo from "./AnimatedLogo";
 import SwimmingFish from "./SwimmingFish";
 
@@ -382,19 +384,38 @@ input::placeholder { color: ${theme.textDim}; }
           <p style={{ color: theme.textDim, fontSize: 13, margin: 0 }}>{filtered.length} producto{filtered.length !== 1 ? "s" : ""}</p>
         </div>
 
-        {/* Grid */}
-        <div className="product-grid">
-          {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} theme={theme} discount={getDiscount(p.specs)} />
-          ))}
-          {filtered.length === 0 && (
-            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 0" }}>
-              <p style={{ color: theme.textDim, fontSize: 16 }}>
-                {products.length === 0 ? "Aún no hay productos cargados en Loyverse" : "No se encontraron productos"}
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Catálogo — Swiper 3D Coverflow */}
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 20px" }}>
+            <p style={{ color: theme.textDim, fontSize: 16 }}>
+              {products.length === 0 ? "Aún no hay productos cargados en Loyverse" : "No se encontraron productos"}
+            </p>
+          </div>
+        ) : (
+          <Swiper
+            className="catalog-swiper"
+            effect="coverflow"
+            grabCursor={true}
+            centeredSlides={true}
+            slidesPerView="auto"
+            coverflowEffect={{
+              rotate: 32,
+              stretch: 0,
+              depth: 140,
+              modifier: 1.15,
+              slideShadows: true,
+            }}
+            pagination={{ clickable: true }}
+            navigation={true}
+            modules={[EffectCoverflow, Pagination, Navigation]}
+          >
+            {filtered.map((p) => (
+              <SwiperSlide key={p.id}>
+                <ProductCard product={p} theme={theme} discount={getDiscount(p.specs)} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </div>
     </>
   );

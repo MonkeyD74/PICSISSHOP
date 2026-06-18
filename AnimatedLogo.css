@@ -1,23 +1,56 @@
+/* ── Hero del logo — fondo oscuro ancho completo ─────────────── */
 .logoHero {
   position: relative;
   width: 100%;
-  min-height: 220px;
-  max-height: 320px;
+  min-height: 260px;
+  max-height: 360px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background: radial-gradient(circle, #071020 0%, #020206 70%);
+  /* gradiente cubre ancho total — no más óvalo centrado */
+  background:
+    radial-gradient(ellipse 130% 100% at 50% 40%, #102040 0%, #071528 35%, #030c1c 65%, #010208 100%);
+}
+
+/* sutiles destellos de agua en las esquinas */
+.logoHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 65% 55% at 10% 80%, rgba(0, 90, 220, 0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 65% 55% at 90% 80%, rgba(0, 180, 140, 0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 40% at 50% 100%, rgba(0, 60, 160, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* línea sutil en la base del hero que separa del fondo */
+.logoHero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,120,255,0.18) 30%, rgba(0,200,180,0.12) 70%, transparent);
+  pointer-events: none;
 }
 
 .mainLogo {
   width: min(55%, 420px);
   border-radius: 16px;
-  filter: drop-shadow(0 0 24px rgba(255, 215, 130, 0.35));
+  filter: drop-shadow(0 0 28px rgba(255, 215, 130, 0.35));
   z-index: 2;
+  position: relative;
 }
 
 @media (max-width: 700px) {
-  .logoHero { min-height: 160px; max-height: 240px; }
-  .mainLogo { width: min(80%, 300px); }
+  .logoHero {
+    min-height: 180px;
+    max-height: 260px;
+  }
+  .mainLogo {
+    width: min(82%, 300px);
+  }
 }

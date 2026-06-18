@@ -200,8 +200,19 @@ class FishState {
     this.targetY     = this.y;
   }
 
-  logoX() { return window.innerWidth / 2 + (this.index === 0 ? -55 : 55); }
-  logoY() { return 160; }
+  logoX() {
+    const hero = document.querySelector(".logoHero");
+    const cx   = hero
+      ? hero.getBoundingClientRect().left + hero.getBoundingClientRect().width / 2
+      : window.innerWidth / 2;
+    return cx + (this.index === 0 ? -65 : 65);
+  }
+  logoY() {
+    const hero = document.querySelector(".logoHero");
+    if (!hero) return 160;
+    const r = hero.getBoundingClientRect();
+    return r.top + r.height * 0.52;          // emerge desde el centro del hero
+  }
 
   swimPos(t) {
     const w = window.innerWidth, h = window.innerHeight;

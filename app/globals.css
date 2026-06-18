@@ -1,3 +1,9 @@
+/* ── Swiper CSS ──────────────────────────────────── */
+@import 'swiper/css';
+@import 'swiper/css/effect-coverflow';
+@import 'swiper/css/pagination';
+@import 'swiper/css/navigation';
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* Todo el contenido de la página por encima del canvas de peces */
@@ -6,6 +12,67 @@
   z-index: 2;
 }
 
+/* ── Swiper overrides — tema oscuro ────────────── */
+.catalog-swiper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 0 70px !important;
+}
+
+.catalog-swiper .swiper-slide {
+  width: 290px;
+  max-width: 90vw;
+  /* Las tarjetas de los lados se ven ligeramente más pequeñas */
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Slide activo destaca sobre los demás */
+.catalog-swiper .swiper-slide-active {
+  z-index: 10;
+}
+
+/* Paginación */
+.catalog-swiper .swiper-pagination {
+  bottom: 12px !important;
+}
+.catalog-swiper .swiper-pagination-bullet {
+  background: rgba(255,255,255,0.35) !important;
+  opacity: 1 !important;
+  width: 8px !important;
+  height: 8px !important;
+  transition: all 0.25s !important;
+}
+.catalog-swiper .swiper-pagination-bullet-active {
+  background: rgba(255,255,255,0.9) !important;
+  width: 22px !important;
+  border-radius: 4px !important;
+}
+
+/* Flechas de navegación */
+.catalog-swiper .swiper-button-next,
+.catalog-swiper .swiper-button-prev {
+  color: rgba(255,255,255,0.45) !important;
+  width: 38px !important;
+  height: 38px !important;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: all 0.2s !important;
+}
+.catalog-swiper .swiper-button-next:hover,
+.catalog-swiper .swiper-button-prev:hover {
+  color: rgba(255,255,255,0.85) !important;
+  background: rgba(255,255,255,0.12);
+}
+.catalog-swiper .swiper-button-next::after,
+.catalog-swiper .swiper-button-prev::after {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+}
+
+/* ── Grid fallback (sin Swiper) ─────────────────── */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -20,5 +87,9 @@
     grid-template-columns: repeat(1, 1fr);
     gap: 10px;
     padding: 12px 10px 60px;
+  }
+  .catalog-swiper .swiper-button-next,
+  .catalog-swiper .swiper-button-prev {
+    display: none !important;
   }
 }
