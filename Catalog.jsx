@@ -368,8 +368,8 @@ export default function Catalog({ products, categories, error }) {
           </div>
         )}
 
-        {/* ── Carrusel 3D Destacados ─────────────────────── */}
-        {featured.length > 0 && (
+        {/* ── Carrusel 3D Destacados — solo en inicio/Todos ── */}
+        {category === "Todos" && featured.length > 0 && (
           <div style={{ paddingTop: 36 }}>
             {/* Título de sección */}
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px 14px", display: "flex", alignItems: "center", gap: 14 }}>
