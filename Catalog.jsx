@@ -484,8 +484,8 @@ export default function Catalog({ products, categories, error }) {
 
       {/* ── Burbujas flotantes que suben del nav (sin re-renders) ── */}
       <div ref={bubbleContainerRef} style={{
-        position: "fixed", bottom: 62, left: 0, right: 0,
-        height: 170, pointerEvents: "none", zIndex: 198, overflow: "hidden",
+        position: "fixed", bottom: 0, left: 0, right: 0,
+        height: 240, pointerEvents: "none", zIndex: 201, overflow: "hidden",
       }} />
 
       {/* ── Menú flotante de categorías ────────────────────────── */}
