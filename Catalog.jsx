@@ -293,19 +293,23 @@ export default function Catalog({ products, categories, error }) {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes pulse { 0%,100% { box-shadow: 0 4px 18px rgba(255,45,85,0.35) } 50% { box-shadow: 0 4px 28px rgba(255,45,85,0.65) } }
-        @keyframes marquee { from { transform: translateX(100%) } to { transform: translateX(-100%) } }
+        @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+        @keyframes pulse   { 0%,100% { box-shadow:0 4px 18px rgba(255,45,85,.35) } 50% { box-shadow:0 4px 28px rgba(255,45,85,.65) } }
+        @keyframes marquee { from { transform:translateX(100%) } to { transform:translateX(-100%) } }
+        @keyframes bubbleGlow { 0%,100% { box-shadow:0 0 10px var(--bub-color,#fff3), 0 4px 20px var(--bub-color,#fff1) } 50% { box-shadow:0 0 22px var(--bub-color,#fff5), 0 6px 28px var(--bub-color,#fff2) } }
+        @keyframes bubblePop  { 0% { transform:translateY(0) scale(1) } 40% { transform:translateY(-5px) scale(1.08) } 100% { transform:translateY(-2px) scale(1.04) } }
         * { box-sizing: border-box; }
-input::placeholder { color: ${theme.textDim}; }
+        input::placeholder { color: ${theme.textDim}; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: ${theme.bg}; }
         ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 3px; }
+        .cat-nav::-webkit-scrollbar { display: none; }
       `}</style>
 
       <div id="page-content" style={{
         minHeight: "100vh", background: theme.bg, color: theme.text,
-        fontFamily: "'DM Sans', sans-serif", transition: "background .5s ease, color .5s ease"
+        fontFamily: "'DM Sans', sans-serif", transition: "background .5s ease, color .5s ease",
+        paddingBottom: 90,                   // espacio para el nav flotante
       }}>
 
         {/* Banner marquee */}
@@ -447,6 +451,60 @@ input::placeholder { color: ${theme.textDim}; }
           )}
         </div>
       </div>
+
+      {/* ── Menú flotante de categorías ────────────────────────── */}
+      <nav style={{
+        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
+        padding: "10px 12px 14px",
+        background: "linear-gradient(to top, rgba(8,8,12,0.97) 60%, rgba(8,8,12,0.82) 85%, transparent 100%)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+      }}>
+        <div className="cat-nav" style={{
+          display: "flex", gap: 8, overflowX: "auto",
+          scrollbarWidth: "none", WebkitOverflowScrolling: "touch",
+          padding: "4px 4px 2px",
+        }}>
+          {categories.map((c) => {
+            const isActive = category === c;
+            const t = CATEGORY_THEMES[c] || CATEGORY_THEMES.Todos;
+            const accent = t.accent || "#888";
+            return (
+              <button
+                key={c}
+                onClick={() => {
+                  setCategory(c);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                style={{
+                  "--bub-color": accent + "66",
+                  flexShrink: 0,
+                  padding: isActive ? "9px 18px" : "7px 14px",
+                  borderRadius: 999,
+                  border: `1.5px solid ${isActive ? accent : "rgba(255,255,255,0.10)"}`,
+                  background: isActive
+                    ? `linear-gradient(135deg, ${accent}28 0%, ${accent}10 100%)`
+                    : "rgba(255,255,255,0.04)",
+                  color: isActive ? accent : "rgba(255,255,255,0.42)",
+                  fontSize: isActive ? 13 : 12,
+                  fontWeight: isActive ? 700 : 400,
+                  cursor: "pointer",
+                  transition: "all 0.22s ease",
+                  animation: isActive
+                    ? "bubblePop 0.3s ease forwards, bubbleGlow 2.4s ease-in-out infinite"
+                    : "none",
+                  transform: isActive ? "translateY(-2px)" : "none",
+                  letterSpacing: isActive ? 0.3 : 0,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t.icon && <span style={{ marginRight: 5 }}>{t.icon}</span>}
+                {c}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </>
   );
 }
