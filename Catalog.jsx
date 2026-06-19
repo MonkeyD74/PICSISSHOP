@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
@@ -289,6 +289,35 @@ export default function Catalog({ products, categories, error }) {
     return withDiscount.length >= 3 ? withDiscount.slice(0, 10) : products.slice(0, 8);
   }, [products]);
 
+  // ── Burbujas flotantes que suben del nav ───────────────────────
+  const bubbleContainerRef = useRef(null);
+  useEffect(() => {
+    const colors = categories.map((c) => (CATEGORY_THEMES[c] || CATEGORY_THEMES.Todos).accent);
+    const container = bubbleContainerRef.current;
+    if (!container) return;
+
+    const spawn = () => {
+      const el = document.createElement("div");
+      const color   = colors[Math.floor(Math.random() * colors.length)];
+      const size    = 7 + Math.random() * 15;          // 7-22 px
+      const x       = 4 + Math.random() * 92;          // % horizontal
+      const dur     = 1600 + Math.random() * 1800;     // ms
+      el.style.cssText = `
+        position:absolute; bottom:0; left:${x}%;
+        width:${size}px; height:${size}px; border-radius:50%;
+        background:${color}22; border:1px solid ${color}44;
+        box-shadow:0 0 ${size * 0.6}px ${color}33;
+        pointer-events:none;
+        animation:floatUp ${dur}ms ease-out forwards;
+      `;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), dur + 120);
+    };
+
+    const id = setInterval(spawn, 380);
+    return () => clearInterval(id);
+  }, [categories]);
+
   return (
     <>
       <style>{`
@@ -298,6 +327,7 @@ export default function Catalog({ products, categories, error }) {
         @keyframes marquee { from { transform:translateX(100%) } to { transform:translateX(-100%) } }
         @keyframes bubbleGlow { 0%,100% { box-shadow:0 0 10px var(--bub-color,#fff3), 0 4px 20px var(--bub-color,#fff1) } 50% { box-shadow:0 0 22px var(--bub-color,#fff5), 0 6px 28px var(--bub-color,#fff2) } }
         @keyframes bubblePop  { 0% { transform:translateY(0) scale(1) } 40% { transform:translateY(-5px) scale(1.08) } 100% { transform:translateY(-2px) scale(1.04) } }
+        @keyframes floatUp    { 0% { transform:translateY(0) scale(1); opacity:.55 } 70% { opacity:.25 } 100% { transform:translateY(-160px) scale(.4); opacity:0 } }
         * { box-sizing: border-box; }
         input::placeholder { color: ${theme.textDim}; }
         ::-webkit-scrollbar { width: 6px; }
@@ -452,6 +482,12 @@ export default function Catalog({ products, categories, error }) {
         </div>
       </div>
 
+      {/* ── Burbujas flotantes que suben del nav (sin re-renders) ── */}
+      <div ref={bubbleContainerRef} style={{
+        position: "fixed", bottom: 62, left: 0, right: 0,
+        height: 170, pointerEvents: "none", zIndex: 198, overflow: "hidden",
+      }} />
+
       {/* ── Menú flotante de categorías ────────────────────────── */}
       <nav style={{
         position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
@@ -467,7 +503,7 @@ export default function Catalog({ products, categories, error }) {
         }}>
           {categories.map((c) => {
             const isActive = category === c;
-            const t = CATEGORY_THEMES[c] || CATEGORY_THEMES.Todos;
+            const t      = CATEGORY_THEMES[c] || CATEGORY_THEMES.Todos;
             const accent = t.accent || "#888";
             return (
               <button
@@ -481,13 +517,14 @@ export default function Catalog({ products, categories, error }) {
                   flexShrink: 0,
                   padding: isActive ? "9px 18px" : "7px 14px",
                   borderRadius: 999,
-                  border: `1.5px solid ${isActive ? accent : "rgba(255,255,255,0.10)"}`,
+                  // Activa: fondo + borde con su color propio
+                  border: `1.5px solid ${isActive ? accent : accent + "40"}`,
                   background: isActive
-                    ? `linear-gradient(135deg, ${accent}28 0%, ${accent}10 100%)`
-                    : "rgba(255,255,255,0.04)",
-                  color: isActive ? accent : "rgba(255,255,255,0.42)",
+                    ? `linear-gradient(135deg, ${accent}30 0%, ${accent}12 100%)`
+                    : `linear-gradient(135deg, ${accent}12 0%, ${accent}06 100%)`,
+                  color: isActive ? accent : accent + "bb",
                   fontSize: isActive ? 13 : 12,
-                  fontWeight: isActive ? 700 : 400,
+                  fontWeight: isActive ? 700 : 500,
                   cursor: "pointer",
                   transition: "all 0.22s ease",
                   animation: isActive
@@ -496,6 +533,7 @@ export default function Catalog({ products, categories, error }) {
                   transform: isActive ? "translateY(-2px)" : "none",
                   letterSpacing: isActive ? 0.3 : 0,
                   whiteSpace: "nowrap",
+                  boxShadow: isActive ? `0 0 14px ${accent}44` : `0 0 6px ${accent}18`,
                 }}
               >
                 {t.icon && <span style={{ marginRight: 5 }}>{t.icon}</span>}
