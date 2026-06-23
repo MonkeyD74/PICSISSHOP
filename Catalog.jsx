@@ -116,7 +116,7 @@ function getDiscount(specs) {
   return isNaN(val) ? 0 : val;
 }
 
-const WA_NUMBER = "523481239175";
+const WA_NUMBER = "523521444391";
 
 const fmt = (n) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
 
@@ -344,7 +344,7 @@ export default function Catalog({ products, categories, error }) {
 
         {/* Banner marquee */}
         <div style={{ background: "linear-gradient(90deg, #0066ff, #0033cc, #0066ff)", padding: "10px 0", overflow: "hidden" }}>
-          <div style={{ whiteSpace: "nowrap", animation: "marquee 70s linear infinite", display: "inline-block" }}>
+          <div style={{ whiteSpace: "nowrap", animation: "marquee 25s linear infinite", display: "inline-block" }}>
             {[...Array(4)].map((_, i) => (
               <span key={i} style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 1, marginRight: 60 }}>
                 🔥 OFERTA ESPECIAL · HASTA 50% DE DESCUENTO · ¡CONSULTA TU PRECIO POR WHATSAPP! 💬 · TIEMPO LIMITADO ⏰
