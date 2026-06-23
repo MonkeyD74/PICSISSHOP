@@ -324,7 +324,7 @@ export default function Catalog({ products, categories, error }) {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
         @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
         @keyframes pulse   { 0%,100% { box-shadow:0 4px 18px rgba(255,45,85,.35) } 50% { box-shadow:0 4px 28px rgba(255,45,85,.65) } }
-        @keyframes marquee { from { transform:translateX(100%) } to { transform:translateX(-100%) } }
+        @keyframes marquee { from { transform:translateX(0%) } to { transform:translateX(-100%) } }
         @keyframes bubbleGlow { 0%,100% { box-shadow:0 0 10px var(--bub-color,#fff3), 0 4px 20px var(--bub-color,#fff1) } 50% { box-shadow:0 0 22px var(--bub-color,#fff5), 0 6px 28px var(--bub-color,#fff2) } }
         @keyframes bubblePop  { 0% { transform:translateY(0) scale(1) } 40% { transform:translateY(-5px) scale(1.08) } 100% { transform:translateY(-2px) scale(1.04) } }
         @keyframes floatUp    { 0% { transform:translateY(0) scale(1); opacity:.55 } 70% { opacity:.25 } 100% { transform:translateY(-160px) scale(.4); opacity:0 } }
@@ -344,7 +344,7 @@ export default function Catalog({ products, categories, error }) {
 
         {/* Banner marquee */}
         <div style={{ background: "linear-gradient(90deg, #0066ff, #0033cc, #0066ff)", padding: "10px 0", overflow: "hidden" }}>
-          <div style={{ whiteSpace: "nowrap", animation: "marquee 25s linear infinite", display: "inline-block" }}>
+          <div style={{ whiteSpace: "nowrap", animation: "marquee 38s linear infinite", display: "inline-block" }}>
             {[...Array(4)].map((_, i) => (
               <span key={i} style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 1, marginRight: 60 }}>
                 💎 REBAJAS · PIEZAS ÚNICAS · CRÉDITO SUJETO A APROBACIÓN(el precio aumenta si aprueba) · PROGRAMA DE RECOMPENSAS CON EL 1% DE REEMBOLSO
