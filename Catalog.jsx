@@ -193,7 +193,7 @@ function ProductCard({ product, theme, discount }) {
         {discount > 0 ? (
           <a href={waURL} target="_blank" rel="noopener noreferrer" style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            background: "linear-gradient(135deg, #ff2d55 0%, #ff6b00 100%)",
+            background: "linear-gradient(135deg, #0066ff 0%, #0033cc 100%)",
             borderRadius: 10, padding: "10px 14px", marginBottom: 12,
             boxShadow: "0 4px 18px rgba(255,45,85,0.35)", animation: "pulse 2s infinite",
             textDecoration: "none", cursor: "pointer",
@@ -347,7 +347,7 @@ export default function Catalog({ products, categories, error }) {
           <div style={{ whiteSpace: "nowrap", animation: "marquee 25s linear infinite", display: "inline-block" }}>
             {[...Array(4)].map((_, i) => (
               <span key={i} style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 1, marginRight: 60 }}>
-                🔥 OFERTA ESPECIAL · HASTA 50% DE DESCUENTO · ¡CONSULTA TU PRECIO POR WHATSAPP! 💬 · TIEMPO LIMITADO ⏰
+                💎 REBAJAS · PIEZAS ÚNICAS · CRÉDITO SUJETO A APROBACIÓN(el precio aumenta si aprueba) · PROGRAMA DE RECOMPENSAS CON EL 1% DE REEMBOLSO
               </span>
             ))}
           </div>
