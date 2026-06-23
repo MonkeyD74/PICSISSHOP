@@ -343,7 +343,7 @@ export default function Catalog({ products, categories, error }) {
       }}>
 
         {/* Banner marquee */}
-        <div style={{ background: "linear-gradient(90deg, #ff2d55, #ff6b00, #ff2d55)", padding: "10px 0", overflow: "hidden" }}>
+        <div style={{ background: "linear-gradient(90deg, #0066ff, #0033cc, #0066ff)", padding: "10px 0", overflow: "hidden" }}>
           <div style={{ whiteSpace: "nowrap", animation: "marquee 70s linear infinite", display: "inline-block" }}>
             {[...Array(4)].map((_, i) => (
               <span key={i} style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 1, marginRight: 60 }}>
