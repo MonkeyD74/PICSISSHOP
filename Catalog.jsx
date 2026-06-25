@@ -279,43 +279,46 @@ function ProductCard({ product, theme, discount }) {
         background: "rgba(0,0,0,0.92)", display: "flex",
         flexDirection: "column", alignItems: "center", justifyContent: "center",
       }}>
-        {/* Imagen */}
+        {/* Imagen — rueda del mouse para zoom en desktop */}
         <img src={imgSrc} alt={product.name}
           onClick={e => e.stopPropagation()}
+          onWheel={e => { e.stopPropagation(); setZoom(z => Math.min(Math.max(z - e.deltaY * 0.001, 0.5), 4)); }}
           style={{
-            maxWidth: "90vw", maxHeight: "70vh", objectFit: "contain",
+            maxWidth: "90vw", maxHeight: "75vh", objectFit: "contain",
             borderRadius: 12, boxShadow: "0 0 60px #0008",
             transform: `scale(${zoom}) rotate(${rotation}deg)`,
-            transition: "transform 0.3s ease",
-            userSelect: "none",
+            transition: "transform 0.2s ease",
+            userSelect: "none", cursor: "grab",
           }} />
 
-        {/* Controles */}
+        {/* Controles — solo rotar y cerrar */}
         <div onClick={e => e.stopPropagation()} style={{
-          marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center",
+          marginTop: 20, display: "flex", gap: 10, justifyContent: "center",
         }}>
-          {[
-            { label: "🔍+", action: () => setZoom(z => Math.min(z + 0.3, 4)) },
-            { label: "🔍−", action: () => setZoom(z => Math.max(z - 0.3, 0.5)) },
-            { label: "↩️", action: () => setRotation(r => r - 90) },
-            { label: "↪️", action: () => setRotation(r => r + 90) },
-            { label: "↺ Reset", action: () => { setZoom(1); setRotation(0); } },
-          ].map(btn => (
-            <button key={btn.label} onClick={btn.action} style={{
-              background: "#ffffff18", border: "1px solid #ffffff30",
-              color: "#fff", borderRadius: 10, padding: "10px 18px",
-              fontSize: 16, cursor: "pointer", fontWeight: 700,
-            }}>{btn.label}</button>
-          ))}
+          <button onClick={() => setRotation(r => r - 90)} style={{
+            background: "#ffffff18", border: "1px solid #ffffff30",
+            color: "#fff", borderRadius: 10, padding: "10px 16px",
+            fontSize: 18, cursor: "pointer",
+          }}>↩️</button>
+          <button onClick={() => setRotation(r => r + 90)} style={{
+            background: "#ffffff18", border: "1px solid #ffffff30",
+            color: "#fff", borderRadius: 10, padding: "10px 16px",
+            fontSize: 18, cursor: "pointer",
+          }}>↪️</button>
+          <button onClick={() => { setZoom(1); setRotation(0); }} style={{
+            background: "#ffffff18", border: "1px solid #ffffff30",
+            color: "#fff", borderRadius: 10, padding: "10px 16px",
+            fontSize: 14, cursor: "pointer",
+          }}>↺</button>
           <button onClick={() => setLightbox(false)} style={{
             background: "#ef444430", border: "1px solid #ef444460",
-            color: "#fca5a5", borderRadius: 10, padding: "10px 18px",
-            fontSize: 16, cursor: "pointer", fontWeight: 700,
-          }}>✕ Cerrar</button>
+            color: "#fca5a5", borderRadius: 10, padding: "10px 16px",
+            fontSize: 18, cursor: "pointer",
+          }}>✕</button>
         </div>
 
-        <p style={{ color: "#ffffff50", fontSize: 12, marginTop: 16 }}>
-          Toca fuera de la imagen para cerrar
+        <p style={{ color: "#ffffff40", fontSize: 11, marginTop: 12 }}>
+          📱 Pellizca para zoom · 🖥️ Rueda del mouse · Toca fuera para cerrar
         </p>
       </div>
     )}
