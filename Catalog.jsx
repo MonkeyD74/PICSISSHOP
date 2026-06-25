@@ -291,31 +291,12 @@ function ProductCard({ product, theme, discount }) {
             userSelect: "none", cursor: "grab",
           }} />
 
-        {/* Controles — solo rotar y cerrar */}
-        <div onClick={e => e.stopPropagation()} style={{
-          marginTop: 20, display: "flex", gap: 10, justifyContent: "center",
-        }}>
-          <button onClick={() => setRotation(r => r - 90)} style={{
-            background: "#ffffff18", border: "1px solid #ffffff30",
-            color: "#fff", borderRadius: 10, padding: "10px 16px",
-            fontSize: 18, cursor: "pointer",
-          }}>↩️</button>
-          <button onClick={() => setRotation(r => r + 90)} style={{
-            background: "#ffffff18", border: "1px solid #ffffff30",
-            color: "#fff", borderRadius: 10, padding: "10px 16px",
-            fontSize: 18, cursor: "pointer",
-          }}>↪️</button>
-          <button onClick={() => { setZoom(1); setRotation(0); }} style={{
-            background: "#ffffff18", border: "1px solid #ffffff30",
-            color: "#fff", borderRadius: 10, padding: "10px 16px",
-            fontSize: 14, cursor: "pointer",
-          }}>↺</button>
-          <button onClick={() => setLightbox(false)} style={{
-            background: "#ef444430", border: "1px solid #ef444460",
-            color: "#fca5a5", borderRadius: 10, padding: "10px 16px",
-            fontSize: 18, cursor: "pointer",
-          }}>✕</button>
-        </div>
+        {/* Solo botón cerrar */}
+        <button onClick={e => { e.stopPropagation(); setLightbox(false); }} style={{
+          marginTop: 20, background: "#ef444430", border: "1px solid #ef444460",
+          color: "#fca5a5", borderRadius: 10, padding: "10px 24px",
+          fontSize: 18, cursor: "pointer",
+        }}>✕ Cerrar</button>
 
         <p style={{ color: "#ffffff40", fontSize: 11, marginTop: 12 }}>
           📱 Pellizca para zoom · 🖥️ Rueda del mouse · Toca fuera para cerrar
