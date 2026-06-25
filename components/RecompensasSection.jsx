@@ -56,7 +56,7 @@ export default function RecompensasSection({ products }) {
   }
 
   return (
-    <section style={{ background: "linear-gradient(180deg,#0a0a14,#0d0d1f)", borderTop: "1px solid #7c3aed30", padding: "48px 16px 120px" }}>
+    <section id="recompensas" style={{ background: "linear-gradient(180deg,#0a0a14,#0d0d1f)", borderTop: "1px solid #7c3aed30", padding: "48px 16px 120px" }}>
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
 
         <div style={{ textAlign: "center", marginBottom: 40 }}>

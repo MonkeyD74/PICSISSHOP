@@ -152,6 +152,9 @@ function ProductCard({ product, theme, discount }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || null);
   const [showSpecs, setShowSpecs] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [lightbox, setLightbox] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
 
   const isCalzado = product.category === "Calzado";
   const tier = isCalzado ? getShoeTier(product.price) : null;
@@ -171,12 +174,15 @@ function ProductCard({ product, theme, discount }) {
   const hasSpecs = Object.keys(product.specs || {}).length > 0;
 
   return (
+    <>
     <div data-product-card="true" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
       background: theme.bgCard, borderRadius: 14, overflow: "hidden", border: cardBorder,
       transition: "all .4s ease", transform: hovered ? "translateY(-4px)" : "none", boxShadow: cardShadow,
     }}>
       <div style={{ position: "relative", overflow: "hidden", aspectRatio: "1", background: theme.bg }}>
-        <img src={imgSrc} alt={product.name} onError={() => setImgError(true)} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease", transform: hovered ? "scale(1.08)" : "scale(1)" }} />
+        <img src={imgSrc} alt={product.name} onError={() => setImgError(true)}
+          onClick={() => { setLightbox(true); setZoom(1); setRotation(0); }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease", transform: hovered ? "scale(1.08)" : "scale(1)", cursor: "zoom-in" }} />
         {/* Pill de categoría con el color propio */}
         <span style={{
           position: "absolute", top: 12, left: 12, background: accentColor,
@@ -265,6 +271,55 @@ function ProductCard({ product, theme, discount }) {
         )}
       </div>
     </div>
+
+    {/* ── Lightbox visor de imagen ── */}
+    {lightbox && (
+      <div onClick={() => setLightbox(false)} style={{
+        position: "fixed", inset: 0, zIndex: 9999,
+        background: "rgba(0,0,0,0.92)", display: "flex",
+        flexDirection: "column", alignItems: "center", justifyContent: "center",
+      }}>
+        {/* Imagen */}
+        <img src={imgSrc} alt={product.name}
+          onClick={e => e.stopPropagation()}
+          style={{
+            maxWidth: "90vw", maxHeight: "70vh", objectFit: "contain",
+            borderRadius: 12, boxShadow: "0 0 60px #0008",
+            transform: `scale(${zoom}) rotate(${rotation}deg)`,
+            transition: "transform 0.3s ease",
+            userSelect: "none",
+          }} />
+
+        {/* Controles */}
+        <div onClick={e => e.stopPropagation()} style={{
+          marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center",
+        }}>
+          {[
+            { label: "🔍+", action: () => setZoom(z => Math.min(z + 0.3, 4)) },
+            { label: "🔍−", action: () => setZoom(z => Math.max(z - 0.3, 0.5)) },
+            { label: "↩️", action: () => setRotation(r => r - 90) },
+            { label: "↪️", action: () => setRotation(r => r + 90) },
+            { label: "↺ Reset", action: () => { setZoom(1); setRotation(0); } },
+          ].map(btn => (
+            <button key={btn.label} onClick={btn.action} style={{
+              background: "#ffffff18", border: "1px solid #ffffff30",
+              color: "#fff", borderRadius: 10, padding: "10px 18px",
+              fontSize: 16, cursor: "pointer", fontWeight: 700,
+            }}>{btn.label}</button>
+          ))}
+          <button onClick={() => setLightbox(false)} style={{
+            background: "#ef444430", border: "1px solid #ef444460",
+            color: "#fca5a5", borderRadius: 10, padding: "10px 18px",
+            fontSize: 16, cursor: "pointer", fontWeight: 700,
+          }}>✕ Cerrar</button>
+        </div>
+
+        <p style={{ color: "#ffffff50", fontSize: 12, marginTop: 16 }}>
+          Toca fuera de la imagen para cerrar
+        </p>
+      </div>
+    )}
+    </>
   );
 }
 
@@ -483,7 +538,30 @@ export default function Catalog({ products, categories, error }) {
         </div>
       </div>
 
-      <RecompensasSection products={products} />{/* ── Burbujas flotantes que suben del nav (sin re-renders) ── */}
+      <RecompensasSection products={products} />
+
+      {/* ── Burbuja flotante → scroll a recompensas ── */}
+      <button
+        onClick={() => document.getElementById("recompensas")?.scrollIntoView({ behavior: "smooth" })}
+        title="Ver Recompensas"
+        style={{
+          position: "fixed", bottom: 80, right: 16, zIndex: 300,
+          width: 52, height: 52, borderRadius: "50%",
+          background: "linear-gradient(135deg,#7c3aed,#4f46e5)",
+          border: "2px solid #a78bfa60",
+          boxShadow: "0 4px 20px #7c3aed66",
+          color: "#fff", fontSize: 22, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          animation: "bubbleGlow 2.4s ease-in-out infinite",
+          transition: "transform 0.2s",
+        }}
+        onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"}
+        onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+      >
+        💎
+      </button>
+
+      {/* ── Burbujas flotantes que suben del nav (sin re-renders) ── */}
       <div ref={bubbleContainerRef} style={{
         position: "fixed", bottom: 0, left: 0, right: 0,
         height: 240, pointerEvents: "none", zIndex: 201, overflow: "hidden",
