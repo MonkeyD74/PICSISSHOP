@@ -1,4 +1,5 @@
-"use client";import RecompensasSection from "./components/RecompensasSection"
+"use client"
+import RecompensasSection from "./components/RecompensasSection"
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
