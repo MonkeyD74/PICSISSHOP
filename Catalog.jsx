@@ -1,4 +1,4 @@
-"use client";
+"use client";import RecompensasSection from "./components/RecompensasSection"
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -482,7 +482,7 @@ export default function Catalog({ products, categories, error }) {
         </div>
       </div>
 
-      {/* ── Burbujas flotantes que suben del nav (sin re-renders) ── */}
+      <RecompensasSection products={products} />{/* ── Burbujas flotantes que suben del nav (sin re-renders) ── */}
       <div ref={bubbleContainerRef} style={{
         position: "fixed", bottom: 0, left: 0, right: 0,
         height: 240, pointerEvents: "none", zIndex: 201, overflow: "hidden",
