@@ -577,7 +577,7 @@ export default function Catalog({ products, categories, error }) {
       {/* Anillos de reventamiento */}
       {pezosBurst && [0, 1, 2].map(i => (
         <div key={i} style={{
-          position: "fixed", top: 16, right: 16, zIndex: 299,
+          position: "fixed", top: 16, left: 16, zIndex: 299,
           width: 62, height: 62, borderRadius: "50%",
           border: "3px solid #ec4899",
           pointerEvents: "none",
@@ -589,11 +589,11 @@ export default function Catalog({ products, categories, error }) {
         onClick={handlePezosClick}
         title="¿Qué son los PEZOS?"
         style={{
-          position: "fixed", top: 16, right: 16, zIndex: 300,
+          position: "fixed", top: 16, left: 16, zIndex: 300,
           width: 62, height: 62, borderRadius: "50%",
           backgroundImage: "url('/pezos.png')",
-          backgroundSize: "210%",
-          backgroundPosition: "72% center",
+          backgroundSize: "160%",
+          backgroundPosition: "78% 42%",
           border: "2px solid #ffffff50",
           cursor: "pointer",
           padding: 0,
