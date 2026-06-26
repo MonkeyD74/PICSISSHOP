@@ -307,10 +307,13 @@ function ProductCard({ product, theme, discount }) {
   );
 }
 
+const WA_PEZOS = `https://wa.me/523521444391?text=${encodeURIComponent("Hola, quiero información sobre los PEZOS 💎")}`
+
 export default function Catalog({ products, categories, error }) {
   const [category, setCategory] = useState("Todos");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("default");
+  const [pezosModal, setPezosModal] = useState(false);
 
   const theme = CATEGORY_THEMES[category] || CATEGORY_THEMES.Todos;
 
@@ -368,6 +371,7 @@ export default function Catalog({ products, categories, error }) {
         @keyframes bubbleGlow { 0%,100% { box-shadow:0 0 10px var(--bub-color,#fff3), 0 4px 20px var(--bub-color,#fff1) } 50% { box-shadow:0 0 22px var(--bub-color,#fff5), 0 6px 28px var(--bub-color,#fff2) } }
         @keyframes bubblePop  { 0% { transform:translateY(0) scale(1) } 40% { transform:translateY(-5px) scale(1.08) } 100% { transform:translateY(-2px) scale(1.04) } }
         @keyframes floatUp    { 0% { transform:translateY(0) scale(1); opacity:.55 } 70% { opacity:.25 } 100% { transform:translateY(-160px) scale(.4); opacity:0 } }
+        @keyframes pezPulse   { 0%,100% { box-shadow:0 0 0 0 #ec489966, 0 4px 20px #3b82f644 } 50% { box-shadow:0 0 0 10px #ec489900, 0 4px 28px #3b82f688 } }
         * { box-sizing: border-box; }
         input::placeholder { color: ${theme.textDim}; }
         ::-webkit-scrollbar { width: 6px; }
@@ -544,6 +548,85 @@ export default function Catalog({ products, categories, error }) {
       >
         💎
       </button>
+
+      {/* ── Burbuja PEZOS — esquina superior derecha ── */}
+      <button
+        onClick={() => setPezosModal(true)}
+        title="¿Qué son los PEZOS?"
+        style={{
+          position: "fixed", top: 16, right: 16, zIndex: 300,
+          width: 56, height: 56, borderRadius: "50%",
+          background: "linear-gradient(135deg,#ec4899,#3b82f6)",
+          border: "2px solid #ffffff40",
+          boxShadow: "0 0 0 0 #ec489966",
+          color: "#fff", fontSize: 26, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          animation: "pezPulse 1.8s ease-in-out infinite",
+        }}
+      >
+        🐟
+      </button>
+
+      {/* ── Modal PEZOS ── */}
+      {pezosModal && (
+        <div
+          onClick={() => setPezosModal(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 9998,
+            background: "rgba(0,0,0,0.88)",
+            display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center",
+            padding: 16,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: 420, width: "100%",
+              borderRadius: 20, overflow: "hidden",
+              boxShadow: "0 0 60px #ec489944, 0 0 60px #3b82f644",
+              border: "1px solid #ffffff20",
+              display: "flex", flexDirection: "column",
+            }}
+          >
+            <img
+              src="/pezos.png"
+              alt="PEZOS - Token de Picsis Shop"
+              style={{ width: "100%", display: "block" }}
+            />
+            <div style={{
+              background: "#0a0a14",
+              padding: "20px 24px",
+              display: "flex", flexDirection: "column", gap: 12,
+            }}>
+              <a
+                href={WA_PEZOS}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "block", textAlign: "center",
+                  background: "linear-gradient(135deg,#25d366,#128c7e)",
+                  color: "#fff", fontWeight: 800, fontSize: 16,
+                  padding: "14px", borderRadius: 12, textDecoration: "none",
+                  letterSpacing: 0.3,
+                }}
+              >
+                💬 Pedir información por WhatsApp
+              </a>
+              <button
+                onClick={() => setPezosModal(false)}
+                style={{
+                  background: "transparent", border: "1px solid #ffffff20",
+                  color: "#9ca3af", borderRadius: 10, padding: "10px",
+                  cursor: "pointer", fontSize: 14,
+                }}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Burbujas flotantes que suben del nav (sin re-renders) ── */}
       <div ref={bubbleContainerRef} style={{
