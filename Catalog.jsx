@@ -314,6 +314,28 @@ export default function Catalog({ products, categories, error }) {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [pezosModal, setPezosModal] = useState(false);
+  const [pezosBurst, setPezosBurst] = useState(false);
+
+  function handlePezosClick() {
+    // Sonido de burbuja via Web Audio API
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = "sine"
+      osc.frequency.setValueAtTime(700, ctx.currentTime)
+      osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.18)
+      gain.gain.setValueAtTime(0.45, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.28)
+    } catch(e) {}
+    // Animación burst → luego abre modal
+    setPezosBurst(true)
+    setTimeout(() => { setPezosBurst(false); setPezosModal(true) }, 420)
+  }
 
   const theme = CATEGORY_THEMES[category] || CATEGORY_THEMES.Todos;
 
@@ -372,6 +394,8 @@ export default function Catalog({ products, categories, error }) {
         @keyframes bubblePop  { 0% { transform:translateY(0) scale(1) } 40% { transform:translateY(-5px) scale(1.08) } 100% { transform:translateY(-2px) scale(1.04) } }
         @keyframes floatUp    { 0% { transform:translateY(0) scale(1); opacity:.55 } 70% { opacity:.25 } 100% { transform:translateY(-160px) scale(.4); opacity:0 } }
         @keyframes pezPulse   { 0%,100% { box-shadow:0 0 0 0 #ec489966, 0 4px 20px #3b82f644 } 50% { box-shadow:0 0 0 10px #ec489900, 0 4px 28px #3b82f688 } }
+        @keyframes burstRing  { 0% { transform:scale(1); opacity:.9 } 100% { transform:scale(3.5); opacity:0 } }
+        @keyframes burstBtn   { 0% { transform:scale(1); opacity:1 } 40% { transform:scale(1.35); opacity:.8 } 100% { transform:scale(0); opacity:0 } }
         * { box-sizing: border-box; }
         input::placeholder { color: ${theme.textDim}; }
         ::-webkit-scrollbar { width: 6px; }
@@ -550,22 +574,34 @@ export default function Catalog({ products, categories, error }) {
       </button>
 
       {/* ── Burbuja PEZOS — esquina superior derecha ── */}
+      {/* Anillos de reventamiento */}
+      {pezosBurst && [0, 1, 2].map(i => (
+        <div key={i} style={{
+          position: "fixed", top: 16, right: 16, zIndex: 299,
+          width: 62, height: 62, borderRadius: "50%",
+          border: "3px solid #ec4899",
+          pointerEvents: "none",
+          animation: `burstRing 0.42s ease-out ${i * 0.07}s forwards`,
+        }} />
+      ))}
+
       <button
-        onClick={() => setPezosModal(true)}
+        onClick={handlePezosClick}
         title="¿Qué son los PEZOS?"
         style={{
           position: "fixed", top: 16, right: 16, zIndex: 300,
-          width: 56, height: 56, borderRadius: "50%",
-          background: "linear-gradient(135deg,#ec4899,#3b82f6)",
-          border: "2px solid #ffffff40",
-          boxShadow: "0 0 0 0 #ec489966",
-          color: "#fff", fontSize: 26, cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          animation: "pezPulse 1.8s ease-in-out infinite",
+          width: 62, height: 62, borderRadius: "50%",
+          backgroundImage: "url('/pezos.png')",
+          backgroundSize: "210%",
+          backgroundPosition: "72% center",
+          border: "2px solid #ffffff50",
+          cursor: "pointer",
+          padding: 0,
+          animation: pezosBurst
+            ? "burstBtn 0.42s ease-out forwards"
+            : "pezPulse 1.8s ease-in-out infinite",
         }}
-      >
-        🐟
-      </button>
+      />
 
       {/* ── Modal PEZOS ── */}
       {pezosModal && (
