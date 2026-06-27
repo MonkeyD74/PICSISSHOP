@@ -99,7 +99,7 @@ export default function Recompensas() {
       {showInfo && (
         <div onClick={() => setShowInfo(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 50 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", maxWidth: 500, width: "100%" }}>
-            <img src="/pezos.png" alt="Como funcionan los pezos" style={{ width: "100%", height: "auto", borderRadius: 14, display: "block" }} />
+            <img src="/pezos.png" alt="Como funcionan los pezos" style={{ width: "100%", height: "auto", borderRadius: 14, display: "block" }} /><a href="/#recompensas" style={{ display: "block", textAlign: "center", marginTop: 14, padding: "13px 0", borderRadius: 10, background: "linear-gradient(90deg,#3b82f6,#ec4899)", color: "#fff", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>Consultar mis pezos</a>
             <button onClick={() => setShowInfo(false)} style={{ position: "absolute", top: 10, right: 10, width: 34, height: 34, borderRadius: "50%", border: "none", background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 18, cursor: "pointer", lineHeight: 1 }}>X</button>
           </div>
         </div>
