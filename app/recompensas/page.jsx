@@ -62,7 +62,7 @@ export default function Recompensas() {
           <h1 style={{ fontSize: 26, fontWeight: 700, margin: "12px 0 4px", background: "linear-gradient(90deg,#3b82f6,#ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             Mis Pezos
           </h1>
-          <p style={{ color: "#888", fontSize: 13, margin: 0 }}>Consulta tus recompensas acumuladas</p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 6 }}><PezosIcon size={22} /><span style={{ color: "#aaa", fontSize: 15, fontWeight: 600 }}>Consulta tus pezos</span><PezosIcon size={22} /></div>
         </div>
 
         {!data ? (
