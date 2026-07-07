@@ -57,9 +57,8 @@ function Card({ p }) {
 
 export default function RecompensasSection({ products }) {
   const excl = products.filter(p => p.category && p.category.toUpperCase() === CAT)
-  const [form, setForm] = useState({ username: "", password: "" })
+  const [telefono, setTelefono] = useState("")
   const [est, setEst] = useState(null)
-  const [showP, setShowP] = useState(false)
 
   async function submit(e) {
     e.preventDefault()
@@ -68,7 +67,7 @@ export default function RecompensasSection({ products }) {
       const r = await fetch("/api/recompensas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ telefono })
       })
       const d = await r.json()
       setEst(r.ok ? d : { error: d.error })
@@ -111,7 +110,7 @@ export default function RecompensasSection({ products }) {
             <PezosIcon size={24} />
           </h3>
           <p style={{ textAlign: "center", color: "#9ca3af", fontSize: 14, marginBottom: 24 }}>
-            Ingresa tus credenciales para ver tu saldo
+            Ingresa tu número de celular para ver tu saldo
           </p>
 
           {est && est !== "cargando" && !est.error && (
@@ -126,10 +125,10 @@ export default function RecompensasSection({ products }) {
               <p style={{ color: "#7c3aed", fontSize: 13, margin: "0 0 16px", fontWeight: 700 }}>pezos acumulados</p>
               <p style={{ color: "#6b7280", fontSize: 12, margin: 0 }}>Total gastado: {PrecioMX(est.gastado)}</p>
               <button
-                onClick={() => { setEst(null); setForm({ username: "", password: "" }) }}
+                onClick={() => { setEst(null); setTelefono("") }}
                 style={{ marginTop: 16, background: "transparent", border: "1px solid #7c3aed60", color: "#a78bfa", borderRadius: 8, padding: "6px 16px", cursor: "pointer", fontSize: 13 }}
               >
-                Cerrar sesion
+                Consultar otro número
               </button>
             </div>
           )}
@@ -137,24 +136,11 @@ export default function RecompensasSection({ products }) {
           {(!est || est === "cargando" || est.error) && (
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ color: "#9ca3af", fontSize: 13, display: "block", marginBottom: 6 }}>Usuario</label>
-                <input type="text" value={form.username}
-                  onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                  placeholder="tu usuario" required
+                <label style={{ color: "#9ca3af", fontSize: 13, display: "block", marginBottom: 6 }}>Número de celular</label>
+                <input type="tel" inputMode="numeric" value={telefono}
+                  onChange={e => setTelefono(e.target.value.replace(/[^\d\s+-]/g, ""))}
+                  placeholder="10 dígitos" required maxLength={16}
                   style={{ width: "100%", padding: "12px 14px", borderRadius: 10, background: "#0f0f1e", border: "1px solid #7c3aed50", color: "#e2e8f0", fontSize: 15, outline: "none", boxSizing: "border-box" }} />
-              </div>
-              <div>
-                <label style={{ color: "#9ca3af", fontSize: 13, display: "block", marginBottom: 6 }}>Contrasena</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showP ? "text" : "password"} value={form.password}
-                    onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                    placeholder="********" required
-                    style={{ width: "100%", padding: "12px 42px 12px 14px", borderRadius: 10, background: "#0f0f1e", border: "1px solid #7c3aed50", color: "#e2e8f0", fontSize: 15, outline: "none", boxSizing: "border-box" }} />
-                  <button type="button" onClick={() => setShowP(v => !v)}
-                    style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#7c3aed", fontSize: 16, padding: 0 }}>
-                    {showP ? "Ocultar" : "Ver"}
-                  </button>
-                </div>
               </div>
 
               {est && est.error && (

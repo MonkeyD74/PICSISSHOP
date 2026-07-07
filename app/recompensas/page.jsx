@@ -27,8 +27,7 @@ const fmtMXN = (n) =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
 
 export default function Recompensas() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -42,7 +41,7 @@ export default function Recompensas() {
       const res = await fetch("/api/recompensas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ telefono }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Error al consultar");
@@ -67,8 +66,7 @@ export default function Recompensas() {
 
         {!data ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Usuario" style={inputStyle} />
-            <input value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && consultar()} type="password" placeholder="Contrasena" style={inputStyle} />
+            <input value={telefono} onChange={(e) => setTelefono(e.target.value.replace(/[^\d\s+-]/g, ""))} onKeyDown={(e) => e.key === "Enter" && consultar()} type="tel" inputMode="numeric" maxLength={16} placeholder="Número de celular (10 dígitos)" style={inputStyle} />
             <button onClick={consultar} disabled={loading} style={{ padding: "13px 0", borderRadius: 10, border: "none", fontWeight: 700, fontSize: 14, cursor: loading ? "default" : "pointer", color: "#fff", background: "linear-gradient(90deg,#3b82f6,#ec4899)", opacity: loading ? 0.6 : 1 }}>
               {loading ? "Consultando..." : "Ver mis pezos"}
             </button>
@@ -89,7 +87,7 @@ export default function Recompensas() {
             <button onClick={() => setShowInfo(true)} style={{ marginTop: 18, padding: "11px 0", width: "100%", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#3b82f6,#ec4899)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
               Como funciona?
             </button>
-            <button onClick={() => { setData(null); setPassword(""); }} style={{ marginTop: 10, padding: "10px 0", width: "100%", borderRadius: 10, border: "1px solid #2a2a3a", background: "transparent", color: "#aaa", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            <button onClick={() => { setData(null); setTelefono(""); }} style={{ marginTop: 10, padding: "10px 0", width: "100%", borderRadius: 10, border: "1px solid #2a2a3a", background: "transparent", color: "#aaa", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
               Salir
             </button>
           </div>
