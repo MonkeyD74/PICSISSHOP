@@ -453,17 +453,18 @@ export default function SwimmingFish() {
     setSize();
     window.addEventListener("resize", setSize);
 
-    const azulFrames = Array.from({ length: 10 }, (_, i) => {
-      const img = new Image();
-      img.src = `/frames-azul/azul_${String(i + 1).padStart(2, "0")}.png`;
-      return img;
-    });
-
-    const rosaFrames = Array.from({ length: 10 }, (_, i) => {
-      const img = new Image();
-      img.src = `/frames-rosa/rosa_${String(i + 1).padStart(2, "0")}.png`;
-      return img;
-    });
+    // Frames diferidos: se crean vacíos y el src se asigna cuando el navegador
+    // está libre, para no competir con las imágenes de productos en la carga inicial.
+    // draw() ya valida frame.complete/naturalWidth, así que es seguro.
+    const azulFrames = Array.from({ length: 10 }, () => new Image());
+    const rosaFrames = Array.from({ length: 10 }, () => new Image());
+    const loadFrames = () => {
+      azulFrames.forEach((img, i) => { img.src = `/frames-azul/azul_${String(i + 1).padStart(2, "0")}.png`; });
+      rosaFrames.forEach((img, i) => { img.src = `/frames-rosa/rosa_${String(i + 1).padStart(2, "0")}.png`; });
+    };
+    let idleId;
+    if ("requestIdleCallback" in window) idleId = requestIdleCallback(loadFrames, { timeout: 2500 });
+    else idleId = setTimeout(loadFrames, 1200);
 
     const fish = [
       new FishState({ speed: 0.06, size: 190, index: 0, splashClass: "fish-splash-blue", glowColor: "#00d4ff", totalFrames: 10 }),
@@ -508,11 +509,18 @@ export default function SwimmingFish() {
 
     let last = performance.now(), animId;
 
+    // Cache de cards: consultar el DOM 60 veces/seg es carísimo en móvil.
+    // Se refresca cada 600ms, suficiente para filtros y scroll infinito.
+    let cards = [], lastCardScan = 0;
+
     function loop(now) {
       const dt    = Math.min((now - last) / 1000, 0.05);
       last        = now;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cards = Array.from(document.querySelectorAll("[data-product-card]"));
+      if (now - lastCardScan > 600) {
+        cards = Array.from(document.querySelectorAll("[data-product-card]"));
+        lastCardScan = now;
+      }
 
       // ── Glow del dedo — muy sutil ─────────────────────────────────
       if (ptrX > 0) {
@@ -543,6 +551,8 @@ export default function SwimmingFish() {
 
     animId = requestAnimationFrame(loop);
     return () => {
+      if ("requestIdleCallback" in window) cancelIdleCallback(idleId);
+      else clearTimeout(idleId);
       cancelAnimationFrame(animId);
       window.removeEventListener("resize",     setSize);
       window.removeEventListener("mousemove",  onMove);

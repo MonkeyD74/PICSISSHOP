@@ -180,7 +180,7 @@ function ProductCard({ product, theme, discount }) {
       transition: "all .4s ease", transform: hovered ? "translateY(-4px)" : "none", boxShadow: cardShadow,
     }}>
       <div style={{ position: "relative", overflow: "hidden", aspectRatio: "1", background: theme.bg }}>
-        <img src={imgSrc} alt={product.name} onError={() => setImgError(true)}
+        <img src={imgSrc} alt={product.name} loading="lazy" decoding="async" onError={() => setImgError(true)}
           onClick={() => { setLightbox(true); setZoom(1); setRotation(0); }}
           style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease", transform: hovered ? "scale(1.08)" : "scale(1)", cursor: "zoom-in" }} />
         {/* Pill de categoría con el color propio */}
@@ -348,6 +348,23 @@ export default function Catalog({ products, categories, error }) {
     return list;
   }, [category, search, sortBy, products]);
 
+  // ── Carga por lotes: renderiza 12 y agrega más al hacer scroll ──
+  const BATCH = 12;
+  const [visibleCount, setVisibleCount] = useState(BATCH);
+  const sentinelRef = useRef(null);
+  useEffect(() => { setVisibleCount(BATCH); }, [category, search, sortBy]);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || visibleCount >= filtered.length) return;
+    const io = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) setVisibleCount((c) => c + BATCH); },
+      { rootMargin: "700px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [visibleCount, filtered.length]);
+  const visibleProducts = filtered.slice(0, visibleCount);
+
   // Destacados: productos con descuento primero; si no hay suficientes, primeros 8
   const featured = useMemo(() => {
     const withDiscount = products.filter((p) => getDiscount(p.specs) > 0);
@@ -386,7 +403,6 @@ export default function Catalog({ products, categories, error }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
         @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
         @keyframes pulse   { 0%,100% { box-shadow:0 4px 18px rgba(255,45,85,.35) } 50% { box-shadow:0 4px 28px rgba(255,45,85,.65) } }
         @keyframes marquee { from { transform:translateX(0%) } to { transform:translateX(-100%) } }
@@ -537,7 +553,7 @@ export default function Catalog({ products, categories, error }) {
         </div>
 
         <div className="product-grid">
-          {filtered.map((p) => (
+          {visibleProducts.map((p) => (
             <ProductCard key={p.id} product={p} theme={theme} discount={getDiscount(p.specs)} />
           ))}
           {filtered.length === 0 && (
@@ -548,6 +564,19 @@ export default function Catalog({ products, categories, error }) {
             </div>
           )}
         </div>
+
+        {/* Sentinel para scroll infinito + botón por si el observer falla */}
+        {visibleCount < filtered.length && (
+          <div ref={sentinelRef} style={{ maxWidth: 1100, margin: "0 auto", padding: "8px 20px 30px", textAlign: "center" }}>
+            <button onClick={() => setVisibleCount((c) => c + BATCH)} style={{
+              background: theme.bgCard, border: `1px solid ${theme.border}`, color: theme.textMuted,
+              borderRadius: 10, padding: "12px 28px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+              fontFamily: "'DM Sans', sans-serif",
+            }}>
+              Ver más ({filtered.length - visibleCount} restantes)
+            </button>
+          </div>
+        )}
       </div>
 
       <RecompensasSection products={products} />
