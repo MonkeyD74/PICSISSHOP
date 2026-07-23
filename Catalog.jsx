@@ -83,6 +83,34 @@ const CATEGORY_THEMES = {
     gradient: "linear-gradient(180deg, #1e1430 0%, #120d1a 100%)",
     subtitle: "🎮 Diversión & Juegos", title: "Juguetes", icon: "🎮",
   },
+  Calsetines: {
+    bg: "#0f1412", bgCard: "#18201c", bgElevated: "#202a24", border: "#2a3a30",
+    text: "#e8f0ec", textMuted: "#80a090", textDim: "#507060",
+    accent: "#20c997", accentBg: "rgba(32,201,151,0.08)",
+    gradient: "linear-gradient(180deg, #14201a 0%, #0f1412 100%)",
+    subtitle: "🧦 Calcetines & Accesorios", title: "Calcetines", icon: "🧦",
+  },
+  Otros: {
+    bg: "#111113", bgCard: "#1a1a1e", bgElevated: "#24242a", border: "#30303a",
+    text: "#e8e8f0", textMuted: "#8888a0", textDim: "#585870",
+    accent: "#8b8fa3", accentBg: "rgba(139,143,163,0.08)",
+    gradient: "linear-gradient(180deg, #1a1a20 0%, #111113 100%)",
+    subtitle: "📦 Varios", title: "Otros", icon: "📦",
+  },
+  "Solo con Pezos": {
+    bg: "#0f1208", bgCard: "#181d10", bgElevated: "#22291a", border: "#303820",
+    text: "#f0f0d8", textMuted: "#a0a870", textDim: "#707840",
+    accent: "#fbbf24", accentBg: "rgba(251,191,36,0.08)",
+    gradient: "linear-gradient(180deg, #1c2410 0%, #0f1208 100%)",
+    subtitle: "💎 Canjea tus Pezos", title: "Solo con Pezos", icon: "💎",
+  },
+  Cosmeticos: {
+    bg: "#150d12", bgCard: "#20141a", bgElevated: "#2c1c24", border: "#3a2430",
+    text: "#f0e4ec", textMuted: "#b088a0", textDim: "#785870",
+    accent: "#e83e8c", accentBg: "rgba(232,62,140,0.08)",
+    gradient: "linear-gradient(180deg, #281420 0%, #150d12 100%)",
+    subtitle: "💄 Belleza & Cosméticos", title: "Cosméticos", icon: "💄",
+  },
 };
 
 const CAT_PILL_COLORS_BY_NAME = {
@@ -96,6 +124,10 @@ const CAT_PILL_COLORS_BY_NAME = {
   Electronicos: { bg: "rgba(0,212,255,0.10)", text: "#00d4ff" },
   Herramientas: { bg: "rgba(245,158,11,0.10)", text: "#f59e0b" },
   Juguetes: { bg: "rgba(168,85,247,0.10)", text: "#a855f7" },
+  Calsetines: { bg: "rgba(32,201,151,0.12)", text: "#20c997" },
+  Otros: { bg: "rgba(139,143,163,0.12)", text: "#8b8fa3" },
+  "Solo con Pezos": { bg: "rgba(251,191,36,0.12)", text: "#fbbf24" },
+  Cosmeticos: { bg: "rgba(232,62,140,0.12)", text: "#e83e8c" },
 };
 const DEFAULT_PILL = { bg: "#1e1e1e", text: "#aaa" };
 
