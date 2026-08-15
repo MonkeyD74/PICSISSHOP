@@ -1,10 +1,31 @@
 import { NextResponse } from 'next/server'
+import { Redis } from '@upstash/redis'
+import { Ratelimit } from '@upstash/ratelimit'
+
+const redis = Redis.fromEnv()
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '10 m'),
+  analytics: true,
+  prefix: '@upstash/ratelimit/recompensas',
+})
 
 // Normaliza a los últimos 10 dígitos (quita +52, espacios, guiones)
 const norm = (s) => String(s || '').replace(/\D/g, '').slice(-10)
 
 export async function POST(req) {
   try {
+    // Rate limiting por IP
+    const forwarded = req.headers.get('x-forwarded-for') || ''
+    const ip = forwarded.split(',')[0].trim() || 'unknown'
+    const { success } = await ratelimit.limit(ip)
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Demasiados intentos, espera unos minutos' },
+        { status: 429 }
+      )
+    }
+
     const { telefono } = await req.json()
     const tel = norm(telefono)
     if (tel.length !== 10)
